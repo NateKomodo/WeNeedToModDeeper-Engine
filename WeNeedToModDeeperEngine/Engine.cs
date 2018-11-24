@@ -23,13 +23,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         }
         public ModEngineLoader(string folder) //CTOR takes in folder for loading mods from
         {
-            if (!Directory.Exists(folder)) //Check if directory exists
+            string path = Path.Combine(System.AppContext.BaseDirectory, folder);
+            if (!Directory.Exists(path)) //Check if directory exists
             {
-                Directory.CreateDirectory(folder); //Create directory
+                Directory.CreateDirectory(path); //Create directory
                 Debug.WriteLine("Folder does not exist, creating");
             }
             Debug.WriteLine("Loading plugins...");
-            List<IPlugin> pluginList = GetPlugins<IPlugin>(folder); //Create a list of plugins
+            List<IPlugin> pluginList = GetPlugins<IPlugin>(path); //Create a list of plugins
             foreach(IPlugin plugin in pluginList) //Loop through plugins and get details, then run the plugin
             {
                 Debug.WriteLine("Loading plugin: " + plugin.GetPluginName() + " by " + plugin.GetAuthor() + ". Version " + plugin.GetPluginVersion());
