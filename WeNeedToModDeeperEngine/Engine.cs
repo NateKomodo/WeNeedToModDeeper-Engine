@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-using System.Diagnostics;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -16,14 +15,24 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         void run();
     }
 
+    public class ModEngine
+    {
+        public ModEngine()
+        {
+            new ModEngineLoader();
+            new ModEngineEventHandler();
+        }
+    }
+
     public class ModEngineLoader
     {
         public static void Main(string[] arguments) //Main method for testing
         {
-            new ModEngineLoader(@"plugins");
+            new ModEngineLoader();
         }
-        public ModEngineLoader(string folder) //CTOR takes in folder for loading mods from
+        public ModEngineLoader() //Load plugins
         {
+            string folder = "plugins";
             new ModEngineEventHandler(); //Init events
             string path = Path.Combine(System.AppContext.BaseDirectory, folder);
             if (!Directory.Exists(path)) //Check if directory exists
@@ -36,7 +45,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
             foreach (IPlugin plugin in pluginList) //Loop through plugins and get details, then run the plugin
             {
                 System.Diagnostics.Debug.WriteLine("Loading plugin: " + plugin.GetPluginName() + " by " + plugin.GetAuthor() + ". Version " + plugin.GetPluginVersion());
-                plugin.run();
+                try
+                {
+                    plugin.run(); //Run the plugin
+                }
+                catch (Exception ex) //If something breaks debug message with an error
+                {
+                    System.Diagnostics.Debug.WriteLine("Error loading plugin: " + plugin.GetPluginName() + " by " + plugin.GetAuthor() + ". Version " + plugin.GetPluginVersion() + ". Exception was: " + ex.Message);
+                }
             }
         }
 
@@ -77,22 +93,22 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         public delegate void EventHandler();
 
         //Events to listen to for event system
-        public event EventHandler OnBossKilled;
-        public event EventHandler OnCaveLeave;
-        public event EventHandler OnGameStart;
-        public event EventHandler OnGameEnd;
-        public event EventHandler OnCaveEnter;
-        public event EventHandler OnBossStart;
-        public event EventHandler OnSteal;
-        public event EventHandler OnPlayerJoinedMidgame;
-        public event EventHandler OnPlayerLeftMidgame;
-        public event EventHandler OnSubmarineDamageCrash;
-        public event EventHandler OnSubmarineDamageDynamite;
-        public event EventHandler OnSubmarineDestroyed;
-        public event EventHandler OnLairGaurdianKilled;
-        public event EventHandler OnTacticalViewEnabled;
-        public event EventHandler OnTacticalViewDisabled;
-        public event EventHandler OnCivEnter;
+        public static event EventHandler OnBossKilled;
+        public static event EventHandler OnCaveLeave;
+        public static event EventHandler OnGameStart;
+        public static event EventHandler OnGameEnd;
+        public static event EventHandler OnCaveEnter;
+        public static event EventHandler OnBossStart;
+        public static event EventHandler OnSteal;
+        public static event EventHandler OnPlayerJoinedMidgame;
+        public static event EventHandler OnPlayerLeftMidgame;
+        public static event EventHandler OnSubmarineDamageCrash;
+        public static event EventHandler OnSubmarineDamageDynamite;
+        public static event EventHandler OnSubmarineDestroyed;
+        public static event EventHandler OnLairGaurdianKilled;
+        public static event EventHandler OnTacticalViewEnabled;
+        public static event EventHandler OnTacticalViewDisabled;
+        public static event EventHandler OnCivEnter;
 
         public ModEngineEventHandler() //CTOR for unifying events, bridges game events with this class for ease of use
         {
@@ -179,44 +195,74 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         }
     }
 
-    public class ModEngineVariables
+    public class ModEngineVariables //Varaible bridge to game code
     {
-        public int gold
+        public static int Gold
         {
             get { return GoldControllerBehavior.gold; }
             set { GoldControllerBehavior.gold = value; }
         }
-        public bool devmode
+        public static bool Devmode
         {
             get { return SubStats.devMode; }
             set { SubStats.devMode = value; }
         }
-        public int playerhealth
+        public static int Playerhealth
         {
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth;  }
             set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth = value; }
         }
-        public SubStats substats
+        public static SubStats Substats
         {
             get { return GameControllerBehavior.subStats; }
             set { GameControllerBehavior.subStats = value; }
         }
-        public int playerMaxHealth
+        public static int PlayerMaxHealth
         {
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth; }
             set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth = value; }
         }
     }
-    public class ModEngineComponents
+
+    public class ModEngineComponents //Class for loading components via unity
     {
-        public HealthController playerHealthController
+        public static Component GetComponent(string gameObject, String classname) //Get a specified class from a game object
         {
-            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>(); }
-        }
-        public SubStats substats
-        {
-            get { return GameControllerBehavior.subStats; }
-            set { GameControllerBehavior.subStats = value; }
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponent(Type.GetType(classname)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
         }
     }
+
+    public class ModEngineChatMessage
+    {
+        public ModEngineChatMessage(string message, PlayerNetworking.ChatMessageType type)
+        {
+            NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, 0); //Send a chat message in any of the fonts
+        }
+    }
+
+    public class ModEngineItem
+    {
+        public ModEngineItem()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ModEngineSubmarine
+    {
+        public ModEngineSubmarine()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    //TODO: Commands?
 }
