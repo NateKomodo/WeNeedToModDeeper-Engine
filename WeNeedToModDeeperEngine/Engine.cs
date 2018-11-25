@@ -32,7 +32,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         }
         public ModEngineLoader() //Load plugins
         {
-            string folder = "plugins";
+            string folder = "Mods";
             new ModEngineEventHandler(); //Init events
             string path = Path.Combine(System.AppContext.BaseDirectory, folder);
             if (!Directory.Exists(path)) //Check if directory exists
