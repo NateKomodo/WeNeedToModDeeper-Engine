@@ -9,6 +9,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="IllusionPlugin">
+      <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\IPA\Data\Managed\IllusionPlugin.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>

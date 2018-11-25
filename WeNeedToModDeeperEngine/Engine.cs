@@ -4,10 +4,11 @@ using System.IO;
 using System;
 using System.Collections;
 using UnityEngine;
+using IllusionPlugin;
 
 namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dll at runtime by a spereate tool.
 {
-    public interface IPlugin //Define Interface for any plugins, including details methods and a run method
+    public interface IMod //Define Interface for any plugins, including details methods and a run method
     {
         string GetPluginName();
         string GetPluginVersion();
@@ -15,21 +16,47 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         void run();
     }
 
-    public class ModEngine
+    public class ModEngine : IPlugin
     {
-        public ModEngine()
+
+        public string Name => "ModEngine";
+
+        public string Version => "v1.1";
+
+        public void OnApplicationQuit()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnApplicationStart()
         {
             new ModEngineLoader();
             new ModEngineEventHandler();
+        }
+
+        public void OnFixedUpdate()
+        {
+            //tba
+        }
+
+        public void OnLevelWasInitialized(int level)
+        {
+            //tba
+        }
+
+        public void OnLevelWasLoaded(int level)
+        {
+            //tba
+        }
+
+        public void OnUpdate()
+        {
+            //tba
         }
     }
 
     public class ModEngineLoader
     {
-        public static void Main(string[] arguments) //Main method for testing
-        {
-            new ModEngineLoader();
-        }
         public ModEngineLoader() //Load mods
         {
             string folder = "Mods";
@@ -41,8 +68,8 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
                 System.Diagnostics.Debug.WriteLine("Folder does not exist, creating");
             }
             System.Diagnostics.Debug.WriteLine("Loading plugins...");
-            List<IPlugin> pluginList = GetPlugins<IPlugin>(path); //Create a list of plugins
-            foreach (IPlugin plugin in pluginList) //Loop through plugins and get details, then run the plugin
+            List<IMod> pluginList = GetPlugins<IMod>(path); //Create a list of plugins
+            foreach (IMod plugin in pluginList) //Loop through plugins and get details, then run the plugin
             {
                 System.Diagnostics.Debug.WriteLine("Loading plugin: " + plugin.GetPluginName() + " by " + plugin.GetAuthor() + ". Version " + plugin.GetPluginVersion());
                 try
