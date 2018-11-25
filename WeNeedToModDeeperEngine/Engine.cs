@@ -222,6 +222,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth; }
             set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth = value; }
         }
+        public static GlobalStats PlayerStats
+        {
+            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<GlobalStats>(); }
+        }
     }
 
     public class ModEngineComponents //Class for loading components via unity
@@ -236,6 +240,56 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
                 return null;
+            }
+        }
+        public static int GetInstanceID(string gameObject) //Get a instance ID from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetInstanceID(); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return -1;
+            }
+        }
+
+        public static GameObject GetObject(string gameObject) //Get a game object from a game object name
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static Component[] GetAllComponents(string gameObject) //Get all components from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponents(typeof(Component)); //Return Components[]
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static bool AddComponent(string gameObject, Type component)
+        {
+            try
+            {
+                GameObject.FindGameObjectWithTag(gameObject).AddComponent(component);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return false
+                return false;
             }
         }
     }
