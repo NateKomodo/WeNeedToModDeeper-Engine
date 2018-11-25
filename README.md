@@ -1,5 +1,7 @@
 # WeNeedToModDeeper-Engine
-Mod engine core for We need to go deeper, it is installed by my other repo, WeNeedToModDeeper-Engine, which pulls the DLL to merge with the game code from the sources here
+Mod engine core for We need to go deeper, it is installed by my other repo, WeNeedToModDeeper-Engine, which pulls the DLL to merge with the game code from the sources here.
+
+[Link to installer](https://github.com/NateKomodo/WeNeedToModDeeper-installer)
 
 # Making a plugin
 A plugin/mod is a way to modify the way the game works
