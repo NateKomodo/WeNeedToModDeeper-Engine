@@ -222,7 +222,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth; }
             set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth = value; }
         }
-        //<Deprecated>
+        [Obsolete("GlobalStats may not function correctly, recomended you use GlobalStats.Variable instead")]
         public static GlobalStats PlayerStats
         {
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<GlobalStats>(); }
