@@ -222,6 +222,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth; }
             set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth = value; }
         }
+        //<Deprecated>
         public static GlobalStats PlayerStats
         {
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<GlobalStats>(); }
@@ -292,13 +293,25 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
                 return false;
             }
         }
+        public static GameObject[] GetAllGameObjects()
+        {
+            try
+            {
+                return (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return false
+                return null;
+            }
+        }
     }
 
     public class ModEngineChatMessage
     {
         public ModEngineChatMessage(string message, PlayerNetworking.ChatMessageType type)
         {
-            NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, 0); //Send a chat message in any of the fonts
+            NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
         }
     }
 
