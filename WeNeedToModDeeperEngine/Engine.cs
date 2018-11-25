@@ -30,7 +30,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         {
             new ModEngineLoader();
         }
-        public ModEngineLoader() //Load plugins
+        public ModEngineLoader() //Load mods
         {
             string folder = "Mods";
             new ModEngineEventHandler(); //Init events
