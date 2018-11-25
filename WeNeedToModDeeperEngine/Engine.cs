@@ -4,7 +4,6 @@ using System.IO;
 using System;
 using System.Collections;
 using UnityEngine;
-using IllusionPlugin;
 
 namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dll at runtime by a spereate tool.
 {
@@ -16,42 +15,16 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         void run();
     }
 
-    public class ModEngine : IPlugin
+    public class ModEngine
     {
-
-        public string Name => "ModEngine";
-
-        public string Version => "v1.1";
-
-        public void OnApplicationQuit()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnApplicationStart()
+        public ModEngine()
         {
             new ModEngineLoader();
             new ModEngineEventHandler();
         }
-
-        public void OnFixedUpdate()
+        public static void Main(string[] args)
         {
-            //tba
-        }
-
-        public void OnLevelWasInitialized(int level)
-        {
-            //tba
-        }
-
-        public void OnLevelWasLoaded(int level)
-        {
-            //tba
-        }
-
-        public void OnUpdate()
-        {
-            //tba
+            new ModEngine();
         }
     }
 
@@ -236,7 +209,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         }
         public static int Playerhealth
         {
-            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth;  }
+            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth; }
             set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth = value; }
         }
         public static SubStats Substats
