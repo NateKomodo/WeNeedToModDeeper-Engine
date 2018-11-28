@@ -17,7 +17,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
 
     public class ModEngine
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             new ModEngineInit();
         }
