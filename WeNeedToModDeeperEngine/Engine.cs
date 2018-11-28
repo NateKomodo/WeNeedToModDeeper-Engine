@@ -17,14 +17,17 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
 
     public class ModEngine
     {
-        public ModEngine()
+        public static void Main(string[] args)
+        {
+            new ModEngineInit();
+        }
+    }
+    public class ModEngineInit
+    {
+        public ModEngineInit()
         {
             new ModEngineLoader();
             new ModEngineEventHandler();
-        }
-        public static void Main(string[] args)
-        {
-            new ModEngine();
         }
     }
 
@@ -328,6 +331,25 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         public ModEngineSubmarine()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class ModEngineNetwork
+    {
+        public ModEngineNetwork()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ModEngineChat
+    {
+        public delegate void ChatDelegate(string text);
+        public static event ChatDelegate ChatEvent;
+
+        public static void MessageSent(string text)
+        {
+            ChatEvent.Invoke(text);
         }
     }
 
