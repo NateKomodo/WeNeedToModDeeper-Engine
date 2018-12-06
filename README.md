@@ -24,19 +24,27 @@ If you want to use other clases, make sure you instanciate them before or instea
 
 ### Events
 To use events, you need to subscribe to one, type ModEngineEventHandler.(Event you want to use) += (A function you want to be called when the event is triggered), when the event is triggered, your function you specified will be called as well.
+
 Example: ModEngineEventHandler.OnBossKilled += bosskilled(); (Where bosskilled() is a void)
 
 ### Variables
 To use game variables, you can use the ModEngineVariables class, by typing ModEngineVariables.(variable) you can fetch the data from the game code without much knowledge of the game code. Some functions may return custom data types, which you can use as abridge to the class.
+
 Example 1: ModEngineVariables.Gold = 1000; (To set, note you can also use -=, += etc) int gold = ModEngineVariables.Gold; (To get)
+
 Example 2: ModEngineVariables.Substats.boostJuice = 100; (Substats has muliple variables in it)
 
 ### Components
 Components are the most powerful part, they allows you to get game objects and classes attached to them, or attach your own. the ModEngineComponent class supports getting components attached to objects, and objects themselves, as well as a list of all objects, and all components for the objects, this allows you a high degree of control over the game code.
+
 Example 1: ModEngineComponents.GetComponent("Player", <HealthController>); returns the health controller class
+  
 Example 2: ModEngineComponents.GetAllComponents("Player"); returns all components attached to the player
+
 Example 3: ModEngineComponents.GetObject("Player"); returns a game object of the player
+
 Example 4: ModEngineComponents.GetAllGameObjects(); returns all the game objects
+
 Example 5: ModEngineComponents.AddComponent("Player", <MyLogicClass>); Adds a class to the player object
   
 ## Using and testing plugins
