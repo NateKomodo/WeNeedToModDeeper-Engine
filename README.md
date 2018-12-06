@@ -3,15 +3,21 @@ Mod engine core for We need to go deeper, it is installed by my other repo, WeNe
 
 [Link to installer](https://github.com/NateKomodo/WeNeedToModDeeper-installer)
 
+**As we now use IPA, this engine is used as a framework or utility for IPA plugins**
+
 # Making a plugin
 A plugin/mod is a way to modify the way the game works
 
 ## Making the project
 Before you start, use the installer to make sure your game code has the engine installed.
-Simply open visual studio and use the class library with .NET framework, then in the soloution explorer, right click dependencies/refrences and press add refrence, it should open a menu, press browse and browse to your game install directory, go into WeNeedToGoDeeper data, then managed and select Assembly-CSharp. You should then have access to the mod engine and the game code.
-You may be asked to add other DLLs in the folder, to do this just repeat the above method except select them instead of Assembly-CSharp
+Simply open visual studio and use the class library with .NET framework, then in the soloution explorer, right click dependencies/refrences and press add refrence, it should open a menu, press browse and browse to your game install directory, go into WeNeedToGoDeeper data, then managed and select Assembly-CSharp, ModEngine and IllusionPlugin. You should then have access to the mod engine and the game code.
+You may be asked to add other DLLs in the folder, to do this just repeat the above method except select them.
+Once this is done you will need to make your class impement IPlugin.
 
-## Using the engine
+## Using IllusionPlugin
+As we now use Illusion plugin, you will need to implement it in your class. This will come with description functions and various level update methods for your to use.
+
+## Using the framework
 The engine has 4 main classes, ModEngineEventHandler, ModEngineVariables, ModEngineComponents and ModEngineChatMessages (WIP), you can use these to control you plugin.
 Make sure your main class implements the IPlugin interface, as it will not be loaded if it does not. This interface comes with methods for you already made, such as getting information about the plugin and a run function, where you put your code in.
 If you want to use other clases, make sure you instanciate them before or instead of calling methods in there
