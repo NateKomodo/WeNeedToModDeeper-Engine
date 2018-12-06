@@ -38,3 +38,6 @@ Example 2: ModEngineComponents.GetAllComponents("Player"); returns all component
 Example 3: ModEngineComponents.GetObject("Player"); returns a game object of the player
 Example 4: ModEngineComponents.GetAllGameObjects(); returns all the game objects
 Example 5: ModEngineComponents.AddComponent("Player", <MyLogicClass>); Adds a class to the player object
+  
+## Using and testing plugins
+Simply build the plugin if its yours, or get the dll if its not, and put it in the Plugins folder in your we need to go deeper install folder
