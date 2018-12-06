@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dll at runtime by a spereate tool.
+namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mod makers can choose to include
 {
     public class ModEngine
     {
