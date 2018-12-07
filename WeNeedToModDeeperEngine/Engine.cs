@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mod makers can choose to include
 {
@@ -151,6 +152,25 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<GlobalStats>(); }
         }
+        public static AIDMBehavior AIDM
+        {
+            get { return GameControllerBehavior.AIDM; }
+            set { GameControllerBehavior.AIDM = value; }
+        }
+        public static int WaterType
+        {
+            get { return GameControllerBehavior.AIDM.NetworkcurrentWaterType; }
+            set { GameControllerBehavior.AIDM.NetworkcurrentWaterType = value; }
+        }
+        public static HealthController GetPlayerHealthController
+        {
+            get { return ModEngineComponents.GetObject("Player").GetComponent<HealthController>(); }
+        }
+        public static bool isDead
+        {
+            get { return ModEngineComponents.GetObject("Player").GetComponent<HealthController>().dead; }
+            set { ModEngineComponents.GetObject("Player").GetComponent<HealthController>().dead = value; }
+        }
     }
 
     public class ModEngineComponents //Class for loading components via unity
@@ -221,7 +241,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             try
             {
-                return (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
+                return (GameObject[])GameObject.FindObjectsOfType(typeof(MonoBehaviour));
             }
             catch (Exception ex)
             {
@@ -236,6 +256,16 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public ModEngineChatMessage(string message, PlayerNetworking.ChatMessageType type)
         {
             NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+        }
+    }
+
+    public class ModEngineTextOverlay
+    {
+        public ModEngineTextOverlay(string message)
+        {
+            MouthBehavior componentInChildren2 = ModEngineComponents.GetObject("Player").GetComponentInChildren<MouthBehavior>();
+            componentInChildren2.afflictedUI.GetComponent<Text>().text = message;
+            componentInChildren2.afflictedUI.GetComponent<Animator>().SetTrigger("Enable");
         }
     }
 
