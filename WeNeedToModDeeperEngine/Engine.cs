@@ -12,7 +12,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
     }
 
-    public class ModEngineEventHandler
+    public class ModEngineLegacyEventHandler
     {
         //Delegate void for event system
         public delegate void EventHandler();
@@ -35,7 +35,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public static event EventHandler OnTacticalViewDisabled;
         public static event EventHandler OnCivEnter;
 
-        public ModEngineEventHandler() //CTOR for unifying events, bridges game events with this class for ease of use
+        public ModEngineLegacyEventHandler() //CTOR for unifying events, bridges game events with this class for ease of use
         {
             ExteriorEnemyHealth.OnBossKilled += delegate ()
             {
@@ -164,22 +164,42 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static HealthController GetPlayerHealthController
         {
-            get { return ModEngineComponents.GetObject("Player").GetComponent<HealthController>(); }
+            get { return ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>(); }
         }
-        public static bool isDead
+        public static bool IsDead
         {
-            get { return ModEngineComponents.GetObject("Player").GetComponent<HealthController>().dead; }
-            set { ModEngineComponents.GetObject("Player").GetComponent<HealthController>().dead = value; }
+            get { return ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>().dead; }
+            set { ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>().dead = value; }
+        }
+        public static HandleWeapons WeaponsHandler
+        {
+            get { return ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>(); }
+        }
+        public static Transform GetPosition(string obj)
+        {
+            return ModEngineComponents.GetObjectFromTag(obj).transform;
         }
     }
 
     public class ModEngineComponents //Class for loading components via unity
     {
-        public static Component GetComponent(string gameObject, String classname) //Get a specified class from a game object
+        public static Component GetComponentFromObject(string gameObject, String classname) //Get a specified class from a game object
         {
             try
             {
                 return GameObject.FindGameObjectWithTag(gameObject).GetComponent(Type.GetType(classname)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static Component GetComponentFromObject<type>(string gameObject) //Get a specified class from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponent(typeof(type)); //Return it based off input
             }
             catch (Exception ex)
             {
@@ -200,7 +220,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
         }
 
-        public static GameObject GetObject(string gameObject) //Get a game object from a game object name
+        public static GameObject GetObjectFromTag(string gameObject) //Get a game object from a game object name
         {
             try
             {
@@ -212,7 +232,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 return null;
             }
         }
-        public static Component[] GetAllComponents(string gameObject) //Get all components from a game object
+        public static Component[] GetAllComponentsFromGameObject(string gameObject) //Get all components from a game object
         {
             try
             {
@@ -224,11 +244,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 return null;
             }
         }
-        public static bool AddComponent(string gameObject, Type component)
+        public static bool AddComponentToGameObject<type>(string gameObject)
         {
             try
             {
-                GameObject.FindGameObjectWithTag(gameObject).AddComponent(component);
+                GameObject.FindGameObjectWithTag(gameObject).AddComponent(typeof(type));
                 return true;
             }
             catch (Exception ex)
@@ -249,6 +269,32 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 return null;
             }
         }
+        public static GameObject GetGameObjectFromComponent<type>()
+        {
+            try
+            {
+                var obj = (GameObject)UnityEngine.Object.FindObjectOfType(typeof(type));
+                return obj.gameObject;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        public static Component GetComponent<type>()
+        {
+            try
+            {
+                var obj = (GameObject)UnityEngine.Object.FindObjectOfType(typeof(type));
+                return obj.GetComponent(typeof(type));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
     }
 
     public class ModEngineChatMessage
@@ -259,13 +305,141 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
     }
 
+    public class ModEngineChatListener
+    {
+        public delegate void MessageEventHandler(string message);
+        public static event MessageEventHandler OnChatMessage;
+
+        public ModEngineChatListener()
+        {
+            var obj = (GameObject)ModEngineComponents.GetGameObjectFromComponent<InputField>();
+            var comp = obj.GetComponent<InputField>();
+            string prevText = "";
+            while (true)
+            {
+                var text = comp.text;
+                if (!(text == prevText))
+                {
+                    if ((text == "" || text == null) && !(prevText == "" || prevText == null))
+                    {
+                        OnChatMessage.Invoke(prevText);
+                    }
+                    prevText = text;
+                }
+            }
+        }
+    }
+
     public class ModEngineTextOverlay
     {
         public ModEngineTextOverlay(string message)
         {
-            MouthBehavior componentInChildren2 = ModEngineComponents.GetObject("Player").GetComponentInChildren<MouthBehavior>();
+            MouthBehavior componentInChildren2 = ModEngineComponents.GetObjectFromTag("Player").GetComponentInChildren<MouthBehavior>();
             componentInChildren2.afflictedUI.GetComponent<Text>().text = message;
             componentInChildren2.afflictedUI.GetComponent<Animator>().SetTrigger("Enable");
+        }
+    }
+    public class ModEngineEvents
+    {
+        public delegate void EventHandler();
+        public delegate void IntEventHandler(int oldValue, int newValue);
+        public delegate void BoolEventHandler(bool oldValue, bool newValue);
+        public delegate void SubstatsEventHandler(SubStats oldValue, SubStats newValue);
+        public delegate void AIDMEventHandler(AIDMBehavior oldValue, AIDMBehavior newValue);
+
+        public event IntEventHandler OnGoldChange;
+        public event IntEventHandler OnPlayerHealthChange;
+        public event IntEventHandler OnPlayerMaxHealthChange;
+        public event IntEventHandler OnBiomeChange;
+        public event IntEventHandler OnSubHealthChange;
+        public event IntEventHandler OnSubMaxHealthChange;
+        public event BoolEventHandler OnDeathStatusChange;
+        public event BoolEventHandler OnCaveStatusChange;
+        public event BoolEventHandler OnCivStatusChanged;
+        public event SubstatsEventHandler OnSubstatsChange;
+        public event AIDMEventHandler OnAIDMChange;
+
+        public ModEngineEvents()
+        {
+            int prevGold = 0;
+            int prevHealth = 10;
+            int prevMaxHealth = 10;
+            int prevBiome = 0;
+            bool prevDead = false;
+            int prevSubHealth = 0;
+            int prevSubMaxHealth = 0;
+            SubStats prevSubStats = null;
+            bool prevCave = false;
+            bool prevCiv = false;
+            AIDMBehavior prevAIDM = null;
+            while (true)
+            {
+                if (!(ModEngineVariables.Gold == prevGold))
+                {
+                    OnGoldChange.Invoke(prevGold, ModEngineVariables.Gold);
+                }
+                prevGold = ModEngineVariables.Gold;
+
+                if (!(ModEngineVariables.Playerhealth == prevHealth))
+                {
+                    OnPlayerHealthChange.Invoke(prevHealth, ModEngineVariables.Playerhealth);
+                }
+                prevHealth = ModEngineVariables.Playerhealth;
+
+                if (!(ModEngineVariables.PlayerMaxHealth == prevMaxHealth))
+                {
+                    OnPlayerHealthChange.Invoke(prevMaxHealth, ModEngineVariables.PlayerMaxHealth);
+                }
+                prevMaxHealth = ModEngineVariables.PlayerMaxHealth;
+
+                if (!(ModEngineVariables.WaterType == prevBiome))
+                {
+                    OnBiomeChange.Invoke(prevBiome, ModEngineVariables.WaterType);
+                }
+                prevBiome = ModEngineVariables.WaterType;
+
+                if (!(ModEngineVariables.IsDead == prevDead))
+                {
+                    OnDeathStatusChange.Invoke(prevDead, ModEngineVariables.IsDead);
+                }
+                prevDead = ModEngineVariables.IsDead;
+
+                if (!(ModEngineVariables.Substats.subHealth == prevSubHealth))
+                {
+                    OnSubHealthChange.Invoke(prevSubHealth, ModEngineVariables.Substats.subHealth);
+                }
+                prevSubHealth = ModEngineVariables.Substats.subHealth;
+
+                if (!(ModEngineVariables.Substats.NetworkmaxSubHealth == prevSubMaxHealth))
+                {
+                    OnSubMaxHealthChange.Invoke(prevSubMaxHealth, ModEngineVariables.Substats.NetworkmaxSubHealth);
+                }
+                prevSubMaxHealth = ModEngineVariables.Substats.NetworkmaxSubHealth;
+
+                if (!(ModEngineVariables.Substats == prevSubStats))
+                {
+                    OnSubstatsChange.Invoke(prevSubStats, ModEngineVariables.Substats);
+                }
+                prevSubStats = ModEngineVariables.Substats;
+
+                if (!(AIDMBehavior.inCave == prevCave))
+                {
+                    OnCaveStatusChange.Invoke(prevCave, AIDMBehavior.inCave);
+                }
+                prevCave = AIDMBehavior.inCave;
+
+                if (!(AIDMBehavior.inCiv == prevCiv))
+                {
+                    OnCivStatusChanged.Invoke(prevCiv, AIDMBehavior.inCiv);
+                }
+                prevCiv = AIDMBehavior.inCiv;
+
+                if (!(ModEngineVariables.AIDM == prevAIDM))
+                {
+                    OnAIDMChange.Invoke(prevAIDM, ModEngineVariables.AIDM);
+                }
+                prevAIDM = ModEngineVariables.AIDM;
+            }
         }
     }
 
@@ -293,16 +467,38 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
     }
 
-    public class ModEngineChat
+    public class ModEngineCommands
     {
-        public delegate void ChatDelegate(string text);
-        public static event ChatDelegate ChatEvent;
-
-        public static void MessageSent(string text)
+        public static void SpawnCave(Vector3 spawnPos, float rotation, CaveBehavior.CaveType type)
         {
-            ChatEvent.Invoke(text);
+            ModEngineVariables.AIDM.SpawnCave(spawnPos, rotation, type);
+        }
+        public static void SpawnCiv()
+        {
+            ModEngineVariables.AIDM.GenerateCivEntrance();
+        }
+        public static void SpawnTimeTravller(float minWait, float maxWait, bool needsSaving)
+        {
+            ModEngineVariables.AIDM.SpawnTimeTraveler(minWait, maxWait, needsSaving);
+        }
+        public static void SpawnBoss()
+        {
+            ModEngineVariables.AIDM.SpawnBoss();
+        }
+        public static void SetItem(ItemSlot slot, ItemType type)
+        {
+            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            handleWeps.SetItem(type, slot);
+        }
+        public static void SwitchItems()
+        {
+            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            handleWeps.SwitchItems();
+        }
+        public static void ForceFire()
+        {
+            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            handleWeps.DoItemAction();
         }
     }
-
-    //TODO: Commands?
 }
