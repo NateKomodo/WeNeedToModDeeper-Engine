@@ -12,114 +12,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
     }
 
-    public class ModEngineLegacyEventHandler
-    {
-        //Delegate void for event system
-        public delegate void EventHandler();
-
-        //Events to listen to for event system
-        public static event EventHandler OnBossKilled;
-        public static event EventHandler OnCaveLeave;
-        public static event EventHandler OnGameStart;
-        public static event EventHandler OnGameEnd;
-        public static event EventHandler OnCaveEnter;
-        public static event EventHandler OnBossStart;
-        public static event EventHandler OnSteal;
-        public static event EventHandler OnPlayerJoinedMidgame;
-        public static event EventHandler OnPlayerLeftMidgame;
-        public static event EventHandler OnSubmarineDamageCrash;
-        public static event EventHandler OnSubmarineDamageDynamite;
-        public static event EventHandler OnSubmarineDestroyed;
-        public static event EventHandler OnLairGaurdianKilled;
-        public static event EventHandler OnTacticalViewEnabled;
-        public static event EventHandler OnTacticalViewDisabled;
-        public static event EventHandler OnCivEnter;
-
-        public ModEngineLegacyEventHandler() //CTOR for unifying events, bridges game events with this class for ease of use
-        {
-            ExteriorEnemyHealth.OnBossKilled += delegate ()
-            {
-                OnBossKilled.Invoke();
-            };
-            NetworkManagerBehavior.LeaveCave += delegate ()
-            {
-                OnCaveLeave.Invoke();
-            };
-            NetworkManagerBehavior.OnStartGame += delegate ()
-            {
-                OnGameStart.Invoke();
-            };
-            NetworkManagerBehavior.OnGameEnd += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            NetworkManagerBehavior.OnGameOver += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            NetworkManagerBehavior.OnGameEndEarly += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            NetworkManagerBehavior.OnGameEndLate += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            InteriorCameraBehavior.OnMyPlayerInCave += delegate ()
-            {
-                OnCaveEnter.Invoke();
-            };
-            InteriorCameraBehavior.OnMyPlayerOutOfCave += delegate ()
-            {
-                OnCaveLeave.Invoke();
-            };
-            ExteriorLevelGeneratorBehavior.OnStartedBossFight += delegate ()
-            {
-                OnBossStart.Invoke();
-            };
-            ShopCaseBehavior.OnShopBroken += delegate ()
-            {
-                OnSteal.Invoke();
-            };
-            PlayerNetworking.PlayerJoinedMidgame += delegate (UnityEngine.GameObject obj)
-            {
-                OnPlayerJoinedMidgame.Invoke();
-            };
-            PlayerNetworking.PlayerLeftMidGame += delegate (UnityEngine.GameObject obj)
-            {
-                OnPlayerLeftMidgame.Invoke();
-            };
-            PlayerNetworking.SubmarineDamageCrash += delegate ()
-            {
-                OnSubmarineDamageCrash.Invoke();
-            };
-            PlayerNetworking.SubmarineDamageDynamite += delegate ()
-            {
-                OnSubmarineDamageDynamite.Invoke();
-            };
-            MoveSubmarine.OnSubmarineDestroyed += delegate ()
-            {
-                OnSubmarineDestroyed.Invoke();
-            };
-            LairGuardianBossBehavior.OnLairGuardianKilled += delegate ()
-            {
-                OnLairGaurdianKilled.Invoke();
-            };
-            TacticalViewBehavior.OnEnabledTacticalView += delegate ()
-            {
-                OnTacticalViewEnabled.Invoke();
-            };
-            TacticalViewBehavior.OnDisabledTacticalView += delegate ()
-            {
-                OnTacticalViewDisabled.Invoke();
-            };
-            MusicManagerBehavior.OnCivMusic += delegate ()
-            {
-                OnCivEnter.Invoke();
-            };
-        }
-    }
-
     public class ModEngineVariables //Varaible bridge to game code
     {
         public static int Gold
@@ -173,7 +65,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static HandleWeapons WeaponsHandler
         {
-            get { return ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>(); }
+            get { return ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>(); }
         }
         public static Transform GetTransform(string obj)
         {
@@ -257,11 +149,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 return false;
             }
         }
-        public static GameObject[] GetAllGameObjects()
+        public static UnityEngine.Object[] GetAllGameObjects()
         {
             try
             {
-                return (GameObject[])GameObject.FindObjectsOfType(typeof(MonoBehaviour));
+                return GameObject.FindObjectsOfType(typeof(MonoBehaviour));
             }
             catch (Exception ex)
             {
@@ -269,11 +161,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 return null;
             }
         }
-        public static GameObject GetGameObjectFromComponent<type>()
+        public static GameObject GetGameObjectWithComponent<comp>()
         {
             try
             {
-                var obj = (GameObject)UnityEngine.Object.FindObjectOfType(typeof(type));
+                var obj = (GameObject)UnityEngine.Object.FindObjectOfType(typeof(comp));
                 return obj.gameObject;
             }
             catch (Exception ex)
@@ -305,31 +197,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
     }
 
-    public class ModEngineChatListener
-    {
-        public delegate void MessageEventHandler(string message);
-        public static event MessageEventHandler OnChatMessage;
-
-        public ModEngineChatListener()
-        {
-            var obj = (GameObject)ModEngineComponents.GetGameObjectFromComponent<InputField>();
-            var comp = obj.GetComponent<InputField>();
-            string prevText = "";
-            while (true)
-            {
-                var text = comp.text;
-                if (!(text == prevText))
-                {
-                    if ((text == "" || text == null) && !(prevText == "" || prevText == null))
-                    {
-                        OnChatMessage.Invoke(prevText);
-                    }
-                    prevText = text;
-                }
-            }
-        }
-    }
-
     public class ModEngineTextOverlay
     {
         public ModEngineTextOverlay(string message)
@@ -353,7 +220,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         static bool prevCiv = false;
         static AIDMBehavior prevAIDM = null;
         static float prevBoostJuice = 0f;
-    
+        static string prevText = "";
+        static int prevBossHealth = 0;
+
         public static bool GoldChange()
         {
             if (!(ModEngineVariables.Gold == prevGold))
@@ -462,7 +331,44 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        //TODO boss health
+        public static string MessageSent()
+        {
+            try
+            {
+                var input = GameObject.Find("ChatBox").GetComponentInChildren<InputField>();
+                var text = input.text;
+                if (text != prevText)
+                {
+                    if (text == null || text == "")
+                    {
+                        if (prevText != null && prevText != "")
+                        {
+                            input.text = "";
+                            string data = prevText;
+                            prevText = text;
+                            return data;
+                        }
+                        input.text = "";
+                    }
+                    prevText = text;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            return null;
+        }
+        public static bool BossHealthChanged()
+        {
+            int health = ModEngineComponents.GetObjectFromTag("Boss").GetComponent<ExteriorEnemyHealth>().Networkhealth;
+            if (!(health == prevBossHealth))
+            {
+                prevBossHealth = health;
+                return true;
+            }
+            return false;
+        }
     }
 
     public class ModEngineItem
@@ -509,17 +415,17 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static void SetItem(ItemSlot slot, ItemType type)
         {
-            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
             handleWeps.SetItem(type, slot);
         }
         public static void SwitchItems()
         {
-            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
             handleWeps.SwitchItems();
         }
         public static void ForceFire()
         {
-            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
             handleWeps.DoItemAction();
         }
     }
