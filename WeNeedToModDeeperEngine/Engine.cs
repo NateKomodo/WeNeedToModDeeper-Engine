@@ -175,7 +175,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             get { return ModEngineComponents.GetGameObjectFromComponent<HandleWeapons>().GetComponent<HandleWeapons>(); }
         }
-        public static Transform GetPosition(string obj)
+        public static Transform GetTransform(string obj)
         {
             return ModEngineComponents.GetObjectFromTag(obj).transform;
         }
