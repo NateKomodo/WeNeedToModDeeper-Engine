@@ -59,7 +59,7 @@ To display feedback to the player, you can either create an overlay over their s
 
 Example: new ModEngineChatMessage("Hello world!", PlayerNetworking.ChatMessageType.BOT);
 
-Example: new ModEngineTextOverlay("Hellow world!");
+Example: new ModEngineTextOverlay("Hello world!");
 
 ### Functions
 You can use ModEngineCommands.(command) to do some functions, such as spawning the time traveler or boss.
