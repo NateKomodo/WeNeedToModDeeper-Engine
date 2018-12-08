@@ -341,105 +341,126 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     }
     public class ModEngineEvents
     {
-        public delegate void EventHandler();
-        public delegate void IntEventHandler(int oldValue, int newValue);
-        public delegate void BoolEventHandler(bool oldValue, bool newValue);
-        public delegate void SubstatsEventHandler(SubStats oldValue, SubStats newValue);
-        public delegate void AIDMEventHandler(AIDMBehavior oldValue, AIDMBehavior newValue);
-
-        public event IntEventHandler OnGoldChange;
-        public event IntEventHandler OnPlayerHealthChange;
-        public event IntEventHandler OnPlayerMaxHealthChange;
-        public event IntEventHandler OnBiomeChange;
-        public event IntEventHandler OnSubHealthChange;
-        public event IntEventHandler OnSubMaxHealthChange;
-        public event BoolEventHandler OnDeathStatusChange;
-        public event BoolEventHandler OnCaveStatusChange;
-        public event BoolEventHandler OnCivStatusChanged;
-        public event SubstatsEventHandler OnSubstatsChange;
-        public event AIDMEventHandler OnAIDMChange;
-
-        public ModEngineEvents()
+        static int prevGold = 0;
+        static int prevHealth = 10;
+        static int prevMaxHealth = 10;
+        static int prevBiome = 0;
+        static bool prevDead = false;
+        static int prevSubHealth = 0;
+        static int prevSubMaxHealth = 0;
+        static SubStats prevSubStats = null;
+        static bool prevCave = false;
+        static bool prevCiv = false;
+        static AIDMBehavior prevAIDM = null;
+        static float prevBoostJuice = 0f;
+    
+        public bool goldChange()
         {
-            int prevGold = 0;
-            int prevHealth = 10;
-            int prevMaxHealth = 10;
-            int prevBiome = 0;
-            bool prevDead = false;
-            int prevSubHealth = 0;
-            int prevSubMaxHealth = 0;
-            SubStats prevSubStats = null;
-            bool prevCave = false;
-            bool prevCiv = false;
-            AIDMBehavior prevAIDM = null;
-            while (true)
+            if (!(ModEngineVariables.Gold == prevGold))
             {
-                if (!(ModEngineVariables.Gold == prevGold))
-                {
-                    OnGoldChange.Invoke(prevGold, ModEngineVariables.Gold);
-                }
                 prevGold = ModEngineVariables.Gold;
-
-                if (!(ModEngineVariables.Playerhealth == prevHealth))
-                {
-                    OnPlayerHealthChange.Invoke(prevHealth, ModEngineVariables.Playerhealth);
-                }
-                prevHealth = ModEngineVariables.Playerhealth;
-
-                if (!(ModEngineVariables.PlayerMaxHealth == prevMaxHealth))
-                {
-                    OnPlayerHealthChange.Invoke(prevMaxHealth, ModEngineVariables.PlayerMaxHealth);
-                }
-                prevMaxHealth = ModEngineVariables.PlayerMaxHealth;
-
-                if (!(ModEngineVariables.WaterType == prevBiome))
-                {
-                    OnBiomeChange.Invoke(prevBiome, ModEngineVariables.WaterType);
-                }
-                prevBiome = ModEngineVariables.WaterType;
-
-                if (!(ModEngineVariables.IsDead == prevDead))
-                {
-                    OnDeathStatusChange.Invoke(prevDead, ModEngineVariables.IsDead);
-                }
-                prevDead = ModEngineVariables.IsDead;
-
-                if (!(ModEngineVariables.Substats.subHealth == prevSubHealth))
-                {
-                    OnSubHealthChange.Invoke(prevSubHealth, ModEngineVariables.Substats.subHealth);
-                }
-                prevSubHealth = ModEngineVariables.Substats.subHealth;
-
-                if (!(ModEngineVariables.Substats.NetworkmaxSubHealth == prevSubMaxHealth))
-                {
-                    OnSubMaxHealthChange.Invoke(prevSubMaxHealth, ModEngineVariables.Substats.NetworkmaxSubHealth);
-                }
-                prevSubMaxHealth = ModEngineVariables.Substats.NetworkmaxSubHealth;
-
-                if (!(ModEngineVariables.Substats == prevSubStats))
-                {
-                    OnSubstatsChange.Invoke(prevSubStats, ModEngineVariables.Substats);
-                }
-                prevSubStats = ModEngineVariables.Substats;
-
-                if (!(AIDMBehavior.inCave == prevCave))
-                {
-                    OnCaveStatusChange.Invoke(prevCave, AIDMBehavior.inCave);
-                }
-                prevCave = AIDMBehavior.inCave;
-
-                if (!(AIDMBehavior.inCiv == prevCiv))
-                {
-                    OnCivStatusChanged.Invoke(prevCiv, AIDMBehavior.inCiv);
-                }
-                prevCiv = AIDMBehavior.inCiv;
-
-                if (!(ModEngineVariables.AIDM == prevAIDM))
-                {
-                    OnAIDMChange.Invoke(prevAIDM, ModEngineVariables.AIDM);
-                }
-                prevAIDM = ModEngineVariables.AIDM;
+                return true;
             }
+            return false;
+        }
+        public bool playerHealthChange()
+        {
+            if (!(ModEngineVariables.Playerhealth == prevHealth))
+            {
+                prevHealth = ModEngineVariables.Playerhealth;
+                return true;
+            }
+            return false;
+        }
+        public bool playerMaxHealthChange()
+        {
+            if (!(ModEngineVariables.PlayerMaxHealth == prevMaxHealth))
+            {
+                prevMaxHealth = ModEngineVariables.PlayerMaxHealth;
+                return true;
+            }
+            return false;
+        }
+        public bool biomeChange()
+        {
+            if (!(ModEngineVariables.WaterType == prevBiome))
+            {
+                prevBiome = ModEngineVariables.WaterType;
+                return true;
+            }
+            return false;
+        }
+        public bool deathStatusChange()
+        {
+            if (!(ModEngineVariables.IsDead == prevDead))
+            {
+                prevDead = ModEngineVariables.IsDead;
+                return true;
+            }
+            return false;
+        }
+        public bool SubHealthChange()
+        {
+            if (!(ModEngineVariables.Substats.NetworksubHealth == prevSubHealth))
+            {
+                prevSubHealth = ModEngineVariables.Substats.NetworksubHealth;
+                return true;
+            }
+            return false;
+        }
+        public bool SubMaxHealthChange()
+        {
+            if (!(ModEngineVariables.Substats.NetworkmaxSubHealth == prevSubMaxHealth))
+            {
+                prevSubMaxHealth = ModEngineVariables.Substats.NetworkmaxSubHealth;
+                return true;
+            }
+            return false;
+        }
+        public bool SubStatsChanged()
+        {
+            if (!(ModEngineVariables.Substats == prevSubStats))
+            {
+                prevSubStats = ModEngineVariables.Substats;
+                return true;
+            }
+            return false;
+        }
+        public bool CaveStatusChange()
+        {
+            if (!(AIDMBehavior.inCave == prevCave))
+            {
+                prevCave = AIDMBehavior.inCave;
+                return true;
+            }
+            return false;
+        }
+        public bool CivStatusChange()
+        {
+            if (!(AIDMBehavior.inCiv == prevCiv))
+            {
+                prevCiv = AIDMBehavior.inCiv;
+                return true;
+            }
+            return false;
+        }
+        public bool AIDMChange()
+        {
+            if (!(ModEngineVariables.AIDM == prevAIDM))
+            {
+                prevAIDM = ModEngineVariables.AIDM;
+                return true;
+            }
+            return false;
+        }
+        public bool FuelChange()
+        {
+            if (!(ModEngineVariables.Substats.boostJuice == prevBoostJuice))
+            {
+                prevBoostJuice = ModEngineVariables.Substats.boostJuice;
+                return true;
+            }
+            return false;
         }
     }
 
