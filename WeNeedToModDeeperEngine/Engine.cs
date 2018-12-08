@@ -354,7 +354,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         static AIDMBehavior prevAIDM = null;
         static float prevBoostJuice = 0f;
     
-        public bool goldChange()
+        public static bool GoldChange()
         {
             if (!(ModEngineVariables.Gold == prevGold))
             {
@@ -363,7 +363,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool playerHealthChange()
+        public static bool PlayerHealthChange()
         {
             if (!(ModEngineVariables.Playerhealth == prevHealth))
             {
@@ -372,7 +372,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool playerMaxHealthChange()
+        public static bool PlayerMaxHealthChange()
         {
             if (!(ModEngineVariables.PlayerMaxHealth == prevMaxHealth))
             {
@@ -381,7 +381,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool biomeChange()
+        public static bool BiomeChange()
         {
             if (!(ModEngineVariables.WaterType == prevBiome))
             {
@@ -390,7 +390,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool deathStatusChange()
+        public static bool DeathStatusChange()
         {
             if (!(ModEngineVariables.IsDead == prevDead))
             {
@@ -399,7 +399,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool SubHealthChange()
+        public static bool SubHealthChange()
         {
             if (!(ModEngineVariables.Substats.NetworksubHealth == prevSubHealth))
             {
@@ -408,7 +408,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool SubMaxHealthChange()
+        public static bool SubMaxHealthChange()
         {
             if (!(ModEngineVariables.Substats.NetworkmaxSubHealth == prevSubMaxHealth))
             {
@@ -417,7 +417,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool SubStatsChanged()
+        public static bool SubStatsChanged()
         {
             if (!(ModEngineVariables.Substats == prevSubStats))
             {
@@ -426,7 +426,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool CaveStatusChange()
+        public static bool CaveStatusChange()
         {
             if (!(AIDMBehavior.inCave == prevCave))
             {
@@ -435,7 +435,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool CivStatusChange()
+        public static bool CivStatusChange()
         {
             if (!(AIDMBehavior.inCiv == prevCiv))
             {
@@ -444,7 +444,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool AIDMChange()
+        public static bool AIDMChange()
         {
             if (!(ModEngineVariables.AIDM == prevAIDM))
             {
@@ -453,7 +453,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public bool FuelChange()
+        public static bool FuelChange()
         {
             if (!(ModEngineVariables.Substats.boostJuice == prevBoostJuice))
             {
@@ -462,6 +462,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
+        //TODO boss health
     }
 
     public class ModEngineItem
