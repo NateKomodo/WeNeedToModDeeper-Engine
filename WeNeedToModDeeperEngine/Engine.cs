@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mod makers can choose to include
@@ -405,9 +406,18 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             ModEngineVariables.AIDM.GenerateCivEntrance();
         }
-        public static void SpawnTimeTravller(float minWait, float maxWait, bool needsSaving)
+        public static void SpawnTimeTravller(bool needsSaving)
         {
-            ModEngineVariables.AIDM.SpawnTimeTraveler(minWait, maxWait, needsSaving);
+            TimeTravelerSpawnPoint[] zones = UnityEngine.Object.FindObjectsOfType<TimeTravelerSpawnPoint>();
+            int randZone = UnityEngine.Random.Range(0, zones.Length);
+            Vector3 spawnPos = zones[randZone].transform.position;
+            GameObject tt = UnityEngine.Object.Instantiate<GameObject>(ModEngineVariables.AIDM.timeTravelerPrefab, spawnPos, Quaternion.identity);
+            TimeTravelerAI_Module timeTravelerAI = tt.GetComponent<TimeTravelerAI_Module>();
+            if (timeTravelerAI != null && needsSaving)
+            {
+                timeTravelerAI.forceGood = true;
+            }
+            NetworkServer.Spawn(tt);
         }
         public static void SpawnBoss()
         {
@@ -428,5 +438,126 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
             handleWeps.DoItemAction();
         }
+    }
+    public class ModEngineSpawns
+    {
+        public static GameObject GetSpawnable(ModEngineSpawnables item)
+        {
+            GameObject toReturn = null;
+            PickupManagerBehavior pm = GameControllerBehavior.pickupManager;
+            foreach (var obj in pm.allConsumableSupplies)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allExteriorWeaponSwaps)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allHandheldItemPickups)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allMercenaries)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allPotions)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allSubUpgrades)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allTorpUpgrades)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allTrash)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            if (item.ToString() == "GoldPileLarge")
+            {
+                GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(GameControllerBehavior.AIDM.timeTravelerPrefab, GameObject.FindGameObjectWithTag("Player").transform.position, Quaternion.identity);
+                TimeTravelerAI_Module comp = gameObject.GetComponent<TimeTravelerAI_Module>();
+                foreach (var spawn in comp.goodSpawns)
+                {
+                    if (spawn.name == "GoldPileLarge") { toReturn = spawn; }
+                }
+            }
+            //GameObject.Find("CavePopulator").GetComponent<CavePopulatorBehavior>().treasureChestPrefabs
+            return toReturn;
+        }
+        public static void SpawnObject(GameObject prefab, Vector2 pos)
+        {
+            var go = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.identity);
+            var comp = go.GetComponent<ItemPickupBehavior>();
+            if (comp != null) { comp.NetworkshowDeadBody = false; }
+            BackpackPickupBehavior component2 = go.GetComponent<BackpackPickupBehavior>();
+            if (component2 != null) { component2.NetworkshowDeadBody = false; }
+            NetworkServer.Spawn(go);
+        }
+    }
+
+    public enum ModEngineSpawnables
+    {
+        FuelBarrel,
+        Barrel,
+        BatteryPickup,
+        ShotgunModPickup,
+        RifleModPickup,
+        obj_ButcherKnifePickup,
+        obj_ChemistryKitPickup,
+        obj_DynamitePickup,
+        obj_eldritchStaffPickup,
+        obj_FlintlockPickup,
+        obj_HealthKitPickup,
+        obj_MonkeyWrenchPickup,
+        obj_PhonographPickup,
+        obj_pickAxePickup,
+        obj_PipeWrenchPickup,
+        obj_PirateSwordPickup,
+        obj_RevolverPickup,
+        obj_RivetGunPickup,
+        obj_RosePickup,
+        obj_SyringePickup,
+        obj_TeslaGunPickup,
+        obj_TranslationBookPickup,
+        obj_WaterPumpPickup,
+        obj_WrenchPickup,
+        BackpackUpgrade,
+        obj_PliersPickup,
+        obj_CivilizationNPC,
+        DamageElixir,
+        HealthElixer,
+        RepairElixir,
+        BulletGrease,
+        CannonUpgrade,
+        EMPDamageUpgrade,
+        EngineUpgrade,
+        HullUpgrade,
+        MaxFuelUpgrade,
+        ShieldUpgrade,
+        AcidModPickup,
+        RocketModPickup,
+        Ln2ModPickup,
+        HomingModPickup,
+        LaserModPickup,
+        HazardousFuelModPickup,
+        DuplicatorModPickup,
+        PoisonElixer,
+        obj_DevSkeleton,
+        obj_BananaPickup,
+        obj_Book,
+        obj_RottenApple,
+        obj_DynamiteSpawner,
+        obj_BrokenSwordPickup,
+        obj_CrabArmPickup,
+        obj_MopPickup,
+        obj_RustyWrenchPickup,
+        TrashAttireUnlock,
+        TrashHatUnlock,
+        GoldPileLarge
     }
 }
