@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -7,6 +8,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
+        static string version = "2.4";
+        static string gameversion = GlobalStats.version;
+
         public static void Main()
         {
             //Just so visual studio doesnt kill me
@@ -19,6 +23,50 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             get { return GoldControllerBehavior.gold; }
             set { GoldControllerBehavior.gold = value; }
+        }
+        public static GameObject Submarine
+        {
+            get { return GameObject.FindGameObjectWithTag("Submarine"); }
+        }
+        public static List<GameObject> PlayersInGame
+        {
+            get { return NetworkManagerBehavior.allPlayersInGame; }
+        }
+        public static List<GameObject> ExteriorEnemies
+        {
+            get
+            {
+                List<GameObject> list = new List<GameObject>();
+                foreach (var comp in UnityEngine.Object.FindObjectsOfType<ExteriorEnemyHealth>())
+                {
+                    list.Add(comp.gameObject);
+                }
+                return list;
+            }
+        }
+        public static List<GameObject> InteriorEnemies
+        {
+            get
+            {
+                List<GameObject> list = new List<GameObject>();
+                foreach (var comp in UnityEngine.Object.FindObjectsOfType<InteriorEnemyDamageController>())
+                {
+                    list.Add(comp.gameObject);
+                }
+                return list;
+            }
+        }
+        public static List<GameObject> Breaks
+        {
+            get
+            {
+                List<GameObject> list = new List<GameObject>();
+                foreach (var comp in UnityEngine.Object.FindObjectsOfType<BreakBehavior>())
+                {
+                    list.Add(comp.gameObject);
+                }
+                return list;
+            }
         }
         public static bool Devmode
         {
@@ -485,6 +533,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 {
                     if (spawn.name == "GoldPileLarge") { toReturn = spawn; }
                 }
+                comp.DestroyTimeTraveler();
             }
             //GameObject.Find("CavePopulator").GetComponent<CavePopulatorBehavior>().treasureChestPrefabs
             return toReturn;
@@ -497,6 +546,23 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             BackpackPickupBehavior component2 = go.GetComponent<BackpackPickupBehavior>();
             if (component2 != null) { component2.NetworkshowDeadBody = false; }
             NetworkServer.Spawn(go);
+        }
+        public static void SpawnTimeTravller(bool needsSaving)
+        {
+            TimeTravelerSpawnPoint[] zones = UnityEngine.Object.FindObjectsOfType<TimeTravelerSpawnPoint>();
+            int randZone = UnityEngine.Random.Range(0, zones.Length);
+            Vector3 spawnPos = zones[randZone].transform.position;
+            GameObject tt = UnityEngine.Object.Instantiate<GameObject>(ModEngineVariables.AIDM.timeTravelerPrefab, spawnPos, Quaternion.identity);
+            TimeTravelerAI_Module timeTravelerAI = tt.GetComponent<TimeTravelerAI_Module>();
+            if (timeTravelerAI != null && needsSaving)
+            {
+                timeTravelerAI.forceGood = true;
+            }
+            NetworkServer.Spawn(tt);
+        }
+        public static void SpawnCave(Vector3 spawnPos, float rotation, CaveBehavior.CaveType type)
+        {
+            ModEngineVariables.AIDM.SpawnCave(spawnPos, rotation, type);
         }
     }
 
