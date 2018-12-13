@@ -23,9 +23,11 @@ Make sure your main class implements the IPlugin interface, as it will not be lo
 If you want to use other clases, make sure you instanciate them before or instead of calling methods in there
 
 ### Events
-To use an event, add an if statement in your update void, in the brackets put ModEngineEvents.(Event), this will be true if the event has happened
+To use an event, instanciate the ModEngineEvents class, add an if statement in your update void, in the brackets put (What you named the instance).(Event), this will be true if the event has happened
 
-Example: if(ModEngineEvents.GoldChange()) { //Do stuffs }
+Example: 
+ModEngineEvents events = new ModEngineEvents();
+if(events.GoldChange()) { //Do stuffs }
 
 ### Variables
 To use game variables, you can use the ModEngineVariables class, by typing ModEngineVariables.(variable) you can fetch the data from the game code without much knowledge of the game code. Some functions may return custom data types, which you can use as abridge to the class.
@@ -48,10 +50,11 @@ Example 4: ModEngineComponents.GetAllGameObjects(); returns all the game objects
 Example 5: ModEngineComponents.AddComponentToGameObject<MyLogicClass>("Player"); Adds a class to the player object
   
 ### Chat commands or message listening
-To create a command, create a string in your update void and set it to ModEngineEvents.MessageSent(), you can then do an if statement on it to see if it matches a command. You can also just see all chat messages this way
+To create a command, create a string in your update void and set it to (instanciated name).MessageSent(), (using your instanciated events handler)you can then do an if statement on it to see if it matches a command. You can also just see all chat messages this way
 
 Example:
-string command = ModEngineEvents.MessageSent();
+ModEngineEvents events = new ModEngineEvents();
+string command = events.MessageSent();
 if (command == "/help") { //dostuff }
 
 ### Displaying text
@@ -68,3 +71,5 @@ Example: ModEngineCommands.SpawnTimeTravller(0f, 0f, true); forces the time trav
   
 ## Using and testing plugins
 Simply build the plugin if its yours, or get the dll if its not, and put it in the Plugins folder in your we need to go deeper install folder
+
+A mod manager will be added to the installer soon
