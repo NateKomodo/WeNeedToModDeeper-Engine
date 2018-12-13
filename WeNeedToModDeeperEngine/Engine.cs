@@ -8,7 +8,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
-        static string version = "2.4";
+        static string version = "2.5";
         static string gameversion = GlobalStats.version;
 
         public static void Main()
@@ -114,7 +114,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static HandleWeapons WeaponsHandler
         {
-            get { return ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>(); }
+            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HandleWeapons>(); }
         }
         public static Transform GetTransform(string obj)
         {
@@ -242,7 +242,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public ModEngineChatMessage(string message, PlayerNetworking.ChatMessageType type)
         {
-            NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+            if (NetworkServer.active)
+            {
+                NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+            }
+            else
+            {
+                NetworkManagerBehavior.myPlayerNetworking.CallCmdCreateMessage(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+            }
         }
     }
 
@@ -255,24 +262,43 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             componentInChildren2.afflictedUI.GetComponent<Animator>().SetTrigger("Enable");
         }
     }
+
+    public class ModEngineCanvasOverlay
+    {
+        public ModEngineCanvasOverlay(string message, int framesToLast)
+        {
+            TechLogCanvasBehavior.SetDisplayString(message, framesToLast);
+        }
+    }
+    public class ModEngineTextTitle
+    {
+        public ModEngineTextTitle(string message)
+        {
+            GameObject gameObject = GameObject.Find("BoostText");
+            gameObject.GetComponent<Animator>().SetTrigger("Enable");
+            gameObject.GetComponent<Text>().text = message;
+        }
+    }
+
     public class ModEngineEvents
     {
-        static int prevGold = 0;
-        static int prevHealth = 10;
-        static int prevMaxHealth = 10;
-        static int prevBiome = 0;
-        static bool prevDead = false;
-        static int prevSubHealth = 0;
-        static int prevSubMaxHealth = 0;
-        static SubStats prevSubStats = null;
-        static bool prevCave = false;
-        static bool prevCiv = false;
-        static AIDMBehavior prevAIDM = null;
-        static float prevBoostJuice = 0f;
-        static string prevText = "";
-        static int prevBossHealth = 0;
+        int prevGold = 0;
+        int prevHealth = 10;
+        int prevMaxHealth = 10;
+        int prevBiome = 0;
+        bool prevDead = false;
+        int prevSubHealth = 0;
+        int prevSubMaxHealth = 0;
+        SubStats prevSubStats = null;
+        bool prevCave = false;
+        bool prevCiv = false;
+        AIDMBehavior prevAIDM = null;
+        float prevBoostJuice = 0f;
+        string prevText = "";
+        int prevBossHealth = 0;
+        List<GameObject> prevConnected;
 
-        public static bool GoldChange()
+        public bool GoldChange()
         {
             if (!(ModEngineVariables.Gold == prevGold))
             {
@@ -281,7 +307,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool PlayerHealthChange()
+        public bool PlayerHealthChange()
         {
             if (!(ModEngineVariables.Playerhealth == prevHealth))
             {
@@ -290,7 +316,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool PlayerMaxHealthChange()
+        public bool PlayerMaxHealthChange()
         {
             if (!(ModEngineVariables.PlayerMaxHealth == prevMaxHealth))
             {
@@ -299,7 +325,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool BiomeChange()
+        public bool BiomeChange()
         {
             if (!(ModEngineVariables.WaterType == prevBiome))
             {
@@ -308,7 +334,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool DeathStatusChange()
+        public bool DeathStatusChange()
         {
             if (!(ModEngineVariables.IsDead == prevDead))
             {
@@ -317,7 +343,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool SubHealthChange()
+        public bool SubHealthChange()
         {
             if (!(ModEngineVariables.Substats.NetworksubHealth == prevSubHealth))
             {
@@ -326,7 +352,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool SubMaxHealthChange()
+        public bool SubMaxHealthChange()
         {
             if (!(ModEngineVariables.Substats.NetworkmaxSubHealth == prevSubMaxHealth))
             {
@@ -335,7 +361,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool SubStatsChanged()
+        public bool SubStatsChanged()
         {
             if (!(ModEngineVariables.Substats == prevSubStats))
             {
@@ -344,7 +370,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool CaveStatusChange()
+        public bool CaveStatusChange()
         {
             if (!(AIDMBehavior.inCave == prevCave))
             {
@@ -353,7 +379,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool CivStatusChange()
+        public bool CivStatusChange()
         {
             if (!(AIDMBehavior.inCiv == prevCiv))
             {
@@ -362,7 +388,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool AIDMChange()
+        public bool AIDMChange()
         {
             if (!(ModEngineVariables.AIDM == prevAIDM))
             {
@@ -371,7 +397,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static bool FuelChange()
+        public bool FuelChange()
         {
             if (!(ModEngineVariables.Substats.boostJuice == prevBoostJuice))
             {
@@ -380,7 +406,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
-        public static string MessageSent()
+        public string MessageSent()
         {
             try
             {
@@ -392,12 +418,12 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     {
                         if (prevText != null && prevText != "")
                         {
-                            input.text = "";
+                            //input.text = "";
                             string data = prevText;
                             prevText = text;
                             return data;
                         }
-                        input.text = "";
+                        //input.text = "";
                     }
                     prevText = text;
                 }
@@ -408,12 +434,22 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return null;
         }
-        public static bool BossHealthChanged()
+        public bool BossHealthChanged()
         {
             int health = ModEngineComponents.GetObjectFromTag("Boss").GetComponent<ExteriorEnemyHealth>().Networkhealth;
             if (!(health == prevBossHealth))
             {
                 prevBossHealth = health;
+                return true;
+            }
+            return false;
+        }
+        public bool ConnectedPlayersChanged()
+        {
+            var connected = NetworkManagerBehavior.allPlayersInGame;
+            if (!(connected == prevConnected))
+            {
+                prevConnected = connected;
                 return true;
             }
             return false;
@@ -450,10 +486,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             ModEngineVariables.AIDM.SpawnCave(spawnPos, rotation, type);
         }
-        public static void SpawnCiv()
-        {
-            ModEngineVariables.AIDM.GenerateCivEntrance();
-        }
         public static void SpawnTimeTravller(bool needsSaving)
         {
             TimeTravelerSpawnPoint[] zones = UnityEngine.Object.FindObjectsOfType<TimeTravelerSpawnPoint>();
@@ -467,23 +499,19 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             NetworkServer.Spawn(tt);
         }
-        public static void SpawnBoss()
-        {
-            ModEngineVariables.AIDM.SpawnBoss();
-        }
         public static void SetItem(ItemSlot slot, ItemType type)
         {
-            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            HandleWeapons handleWeps = ModEngineVariables.WeaponsHandler;
             handleWeps.SetItem(type, slot);
         }
         public static void SwitchItems()
         {
-            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            HandleWeapons handleWeps = ModEngineVariables.WeaponsHandler;
             handleWeps.SwitchItems();
         }
         public static void ForceFire()
         {
-            HandleWeapons handleWeps = ModEngineComponents.GetGameObjectWithComponent<HandleWeapons>().GetComponent<HandleWeapons>();
+            HandleWeapons handleWeps = ModEngineVariables.WeaponsHandler;
             handleWeps.DoItemAction();
         }
     }
@@ -533,7 +561,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 {
                     if (spawn.name == "GoldPileLarge") { toReturn = spawn; }
                 }
-                comp.DestroyTimeTraveler();
+                GameObject.Destroy(gameObject);
             }
             //GameObject.Find("CavePopulator").GetComponent<CavePopulatorBehavior>().treasureChestPrefabs
             return toReturn;
