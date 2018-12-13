@@ -28,6 +28,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             get { return GameObject.FindGameObjectWithTag("Submarine"); }
         }
+        public static MoveCharacter MoveCharacter
+        {
+            get { return (MoveCharacter)ModEngineComponents.GetComponentFromObject<MoveCharacter>("Player"); }
+        }
         public static List<GameObject> PlayersInGame
         {
             get { return NetworkManagerBehavior.allPlayersInGame; }
@@ -100,7 +104,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static int WaterType
         {
-            get { return GameControllerBehavior.AIDM.NetworkcurrentWaterType; }
+            get
+            {
+                if (GameControllerBehavior.AIDM != null) { return GameControllerBehavior.AIDM.NetworkcurrentWaterType; } else { return 0; }
+            }
             set { GameControllerBehavior.AIDM.NetworkcurrentWaterType = value; }
         }
         public static HealthController GetPlayerHealthController
@@ -419,12 +426,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     {
                         if (prevText != null && prevText != "")
                         {
-                            //input.text = "";
                             string data = prevText;
                             prevText = text;
                             return data;
                         }
-                        //input.text = "";
                     }
                     prevText = text;
                 }
