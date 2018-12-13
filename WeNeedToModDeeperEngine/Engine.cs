@@ -410,7 +410,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             try
             {
-                var input = GameObject.Find("ChatBox").GetComponentInChildren<InputField>();
+                var input = GameObject.FindObjectOfType<ChatBoxBehavior>().gameObject.GetComponentInChildren<InputField>();
                 var text = input.text;
                 if (text != prevText)
                 {
