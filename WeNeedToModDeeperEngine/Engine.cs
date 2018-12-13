@@ -143,11 +143,35 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 return null;
             }
         }
+        public static Component GetChildComponentFromObject(string gameObject, String classname) //Get a specified class from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponentInChildren(Type.GetType(classname)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
         public static Component GetComponentFromObject<type>(string gameObject) //Get a specified class from a game object
         {
             try
             {
                 return GameObject.FindGameObjectWithTag(gameObject).GetComponent(typeof(type)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static Component GetChildComponentFromObject<type>(string gameObject) //Get a specified class from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponentInChildren(typeof(type)); //Return it based off input
             }
             catch (Exception ex)
             {
