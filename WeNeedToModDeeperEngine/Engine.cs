@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -8,8 +9,8 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
-        static string version = "2.5";
-        static string gameversion = GlobalStats.version;
+        public static string version = "2.7";
+        public static string gameversion = GlobalStats.version;
 
         public static void Main()
         {
@@ -477,9 +478,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public bool ConnectedPlayersChanged()
         {
             var connected = NetworkManagerBehavior.allPlayersInGame;
-            if (!(connected == prevConnected))
+            var isSame = connected.All(prevConnected.Contains) && connected.Count == prevConnected.Count;
+            if (!isSame)
             {
-                prevConnected = connected;
+                prevConnected.Clear();
+                foreach (var item in connected)
+                {
+                    prevConnected.Add(item);
+                }
                 return true;
             }
             return false;
