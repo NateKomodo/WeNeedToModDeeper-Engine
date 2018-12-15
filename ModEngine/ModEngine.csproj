@@ -45,6 +45,10 @@
     <Reference Include="UnityEngine">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>

@@ -1,197 +1,20 @@
-﻿using System.Reflection;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System;
-using System.Collections;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
-namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dll at runtime by a spereate tool.
+namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mod makers can choose to include
 {
-    public interface IMod //Define Interface for any plugins, including details methods and a run method
-    {
-        string GetPluginName();
-        string GetPluginVersion();
-        string GetAuthor();
-        void run();
-    }
-
     public class ModEngine
     {
-        public ModEngine()
-        {
-            new ModEngineLoader();
-            new ModEngineEventHandler();
-        }
-        public static void Main(string[] args)
-        {
-            new ModEngine();
-        }
-    }
+        public static string version = "2.8";
+        public static string gameversion = GlobalStats.version;
 
-    public class ModEngineLoader
-    {
-        public ModEngineLoader() //Load mods
+        public static void Main()
         {
-            string folder = "Mods";
-            new ModEngineEventHandler(); //Init events
-            string path = Path.Combine(System.AppContext.BaseDirectory, folder);
-            if (!Directory.Exists(path)) //Check if directory exists
-            {
-                Directory.CreateDirectory(path); //Create directory
-                System.Diagnostics.Debug.WriteLine("Folder does not exist, creating");
-            }
-            System.Diagnostics.Debug.WriteLine("Loading plugins...");
-            List<IMod> pluginList = GetPlugins<IMod>(path); //Create a list of plugins
-            foreach (IMod plugin in pluginList) //Loop through plugins and get details, then run the plugin
-            {
-                System.Diagnostics.Debug.WriteLine("Loading plugin: " + plugin.GetPluginName() + " by " + plugin.GetAuthor() + ". Version " + plugin.GetPluginVersion());
-                try
-                {
-                    plugin.run(); //Run the plugin
-                }
-                catch (Exception ex) //If something breaks debug message with an error
-                {
-                    System.Diagnostics.Debug.WriteLine("Error loading plugin: " + plugin.GetPluginName() + " by " + plugin.GetAuthor() + ". Version " + plugin.GetPluginVersion() + ". Exception was: " + ex.Message);
-                }
-            }
-        }
-
-        public List<T> GetPlugins<T>(string folder) //Loads plugins into a list
-        {
-            string[] files = Directory.GetFiles(folder, "*.dll"); //Get all DLLs in the plugin directory
-            List<T> tList = new List<T>(); //Create a list for return and holding plugins
-            System.Diagnostics.Debug.Assert(typeof(T).IsInterface); //Check that T is an interface for debug
-            foreach (string file in files) //Loop through the DLL files in the folder
-            {
-                try
-                {
-                    Assembly assembly = Assembly.LoadFile(file); //Load the assembly
-                    foreach (Type type in assembly.GetTypes()) //Loop through types in the assembly
-                    {
-                        if (!type.IsClass || type.IsNotPublic) continue; //We only want classes that are public
-                        Type[] interfaces = type.GetInterfaces(); //Get implemented interfaces
-                        if (((IList)interfaces).Contains(typeof(T))) //If the class implements the IPlugin interface
-                        {
-                            object obj = Activator.CreateInstance(type); //instanciate the class
-                            T t = (T)obj; //Cast it to the type
-                            tList.Add(t); //Add it to the list
-                        }
-                    }
-                }
-                catch (Exception ex) //If something fails
-                {
-                    System.Diagnostics.Debug.Fail(ex.Message); //Print error message over debug
-                }
-            }
-            return tList; //Return the list
-        }
-    }
-
-    public class ModEngineEventHandler
-    {
-        //Delegate void for event system
-        public delegate void EventHandler();
-
-        //Events to listen to for event system
-        public static event EventHandler OnBossKilled;
-        public static event EventHandler OnCaveLeave;
-        public static event EventHandler OnGameStart;
-        public static event EventHandler OnGameEnd;
-        public static event EventHandler OnCaveEnter;
-        public static event EventHandler OnBossStart;
-        public static event EventHandler OnSteal;
-        public static event EventHandler OnPlayerJoinedMidgame;
-        public static event EventHandler OnPlayerLeftMidgame;
-        public static event EventHandler OnSubmarineDamageCrash;
-        public static event EventHandler OnSubmarineDamageDynamite;
-        public static event EventHandler OnSubmarineDestroyed;
-        public static event EventHandler OnLairGaurdianKilled;
-        public static event EventHandler OnTacticalViewEnabled;
-        public static event EventHandler OnTacticalViewDisabled;
-        public static event EventHandler OnCivEnter;
-
-        public ModEngineEventHandler() //CTOR for unifying events, bridges game events with this class for ease of use
-        {
-            ExteriorEnemyHealth.OnBossKilled += delegate ()
-            {
-                OnBossKilled.Invoke();
-            };
-            NetworkManagerBehavior.LeaveCave += delegate ()
-            {
-                OnCaveLeave.Invoke();
-            };
-            NetworkManagerBehavior.OnStartGame += delegate ()
-            {
-                OnGameStart.Invoke();
-            };
-            NetworkManagerBehavior.OnGameEnd += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            NetworkManagerBehavior.OnGameOver += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            NetworkManagerBehavior.OnGameEndEarly += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            NetworkManagerBehavior.OnGameEndLate += delegate ()
-            {
-                OnGameEnd.Invoke();
-            };
-            InteriorCameraBehavior.OnMyPlayerInCave += delegate ()
-            {
-                OnCaveEnter.Invoke();
-            };
-            InteriorCameraBehavior.OnMyPlayerOutOfCave += delegate ()
-            {
-                OnCaveLeave.Invoke();
-            };
-            ExteriorLevelGeneratorBehavior.OnStartedBossFight += delegate ()
-            {
-                OnBossStart.Invoke();
-            };
-            ShopCaseBehavior.OnShopBroken += delegate ()
-            {
-                OnSteal.Invoke();
-            };
-            PlayerNetworking.PlayerJoinedMidgame += delegate (UnityEngine.GameObject obj)
-            {
-                OnPlayerJoinedMidgame.Invoke();
-            };
-            PlayerNetworking.PlayerLeftMidGame += delegate (UnityEngine.GameObject obj)
-            {
-                OnPlayerLeftMidgame.Invoke();
-            };
-            PlayerNetworking.SubmarineDamageCrash += delegate ()
-            {
-                OnSubmarineDamageCrash.Invoke();
-            };
-            PlayerNetworking.SubmarineDamageDynamite += delegate ()
-            {
-                OnSubmarineDamageDynamite.Invoke();
-            };
-            MoveSubmarine.OnSubmarineDestroyed += delegate ()
-            {
-                OnSubmarineDestroyed.Invoke();
-            };
-            LairGuardianBossBehavior.OnLairGuardianKilled += delegate ()
-            {
-                OnLairGaurdianKilled.Invoke();
-            };
-            TacticalViewBehavior.OnEnabledTacticalView += delegate ()
-            {
-                OnTacticalViewEnabled.Invoke();
-            };
-            TacticalViewBehavior.OnDisabledTacticalView += delegate ()
-            {
-                OnTacticalViewDisabled.Invoke();
-            };
-            MusicManagerBehavior.OnCivMusic += delegate ()
-            {
-                OnCivEnter.Invoke();
-            };
+            //Just so visual studio doesnt kill me
         }
     }
 
@@ -201,6 +24,54 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         {
             get { return GoldControllerBehavior.gold; }
             set { GoldControllerBehavior.gold = value; }
+        }
+        public static GameObject Submarine
+        {
+            get { return GameObject.FindGameObjectWithTag("Submarine"); }
+        }
+        public static MoveCharacter MoveCharacter
+        {
+            get { return (MoveCharacter)ModEngineComponents.GetComponentFromObject<MoveCharacter>("Player"); }
+        }
+        public static List<GameObject> PlayersInGame
+        {
+            get { return NetworkManagerBehavior.allPlayersInGame; }
+        }
+        public static List<GameObject> ExteriorEnemies
+        {
+            get
+            {
+                List<GameObject> list = new List<GameObject>();
+                foreach (var comp in UnityEngine.Object.FindObjectsOfType<ExteriorEnemyHealth>())
+                {
+                    list.Add(comp.gameObject);
+                }
+                return list;
+            }
+        }
+        public static List<GameObject> InteriorEnemies
+        {
+            get
+            {
+                List<GameObject> list = new List<GameObject>();
+                foreach (var comp in UnityEngine.Object.FindObjectsOfType<InteriorEnemyDamageController>())
+                {
+                    list.Add(comp.gameObject);
+                }
+                return list;
+            }
+        }
+        public static List<GameObject> Breaks
+        {
+            get
+            {
+                List<GameObject> list = new List<GameObject>();
+                foreach (var comp in UnityEngine.Object.FindObjectsOfType<BreakBehavior>())
+                {
+                    list.Add(comp.gameObject);
+                }
+                return list;
+            }
         }
         public static bool Devmode
         {
@@ -227,15 +98,81 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         {
             get { return GameObject.FindGameObjectWithTag("Player").GetComponent<GlobalStats>(); }
         }
+        public static AIDMBehavior AIDM
+        {
+            get { return GameControllerBehavior.AIDM; }
+            set { GameControllerBehavior.AIDM = value; }
+        }
+        public static int WaterType
+        {
+            get
+            {
+                if (GameControllerBehavior.AIDM != null) { return GameControllerBehavior.AIDM.NetworkcurrentWaterType; } else { return 0; }
+            }
+            set { GameControllerBehavior.AIDM.NetworkcurrentWaterType = value; }
+        }
+        public static HealthController GetPlayerHealthController
+        {
+            get { return ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>(); }
+        }
+        public static bool IsDead
+        {
+            get { return ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>().dead; }
+            set { ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>().dead = value; }
+        }
+        public static HandleWeapons WeaponsHandler
+        {
+            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HandleWeapons>(); }
+        }
+        public static Transform GetTransform(string obj)
+        {
+            return ModEngineComponents.GetObjectFromTag(obj).transform;
+        }
     }
 
     public class ModEngineComponents //Class for loading components via unity
     {
-        public static Component GetComponent(string gameObject, String classname) //Get a specified class from a game object
+        public static Component GetComponentFromObject(string gameObject, String classname) //Get a specified class from a game object
         {
             try
             {
                 return GameObject.FindGameObjectWithTag(gameObject).GetComponent(Type.GetType(classname)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static Component GetChildComponentFromObject(string gameObject, String classname) //Get a specified class from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponentInChildren(Type.GetType(classname)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static Component GetComponentFromObject<type>(string gameObject) //Get a specified class from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponent(typeof(type)); //Return it based off input
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return null
+                return null;
+            }
+        }
+        public static Component GetChildComponentFromObject<type>(string gameObject) //Get a specified class from a game object
+        {
+            try
+            {
+                return GameObject.FindGameObjectWithTag(gameObject).GetComponentInChildren(typeof(type)); //Return it based off input
             }
             catch (Exception ex)
             {
@@ -256,7 +193,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
             }
         }
 
-        public static GameObject GetObject(string gameObject) //Get a game object from a game object name
+        public static GameObject GetObjectFromTag(string gameObject) //Get a game object from a game object name
         {
             try
             {
@@ -268,7 +205,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
                 return null;
             }
         }
-        public static Component[] GetAllComponents(string gameObject) //Get all components from a game object
+        public static Component[] GetAllComponentsFromGameObject(string gameObject) //Get all components from a game object
         {
             try
             {
@@ -280,11 +217,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
                 return null;
             }
         }
-        public static bool AddComponent(string gameObject, Type component)
+        public static bool AddComponentToGameObject<type>(string gameObject)
         {
             try
             {
-                GameObject.FindGameObjectWithTag(gameObject).AddComponent(component);
+                GameObject.FindGameObjectWithTag(gameObject).AddComponent(typeof(type));
                 return true;
             }
             catch (Exception ex)
@@ -293,15 +230,41 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
                 return false;
             }
         }
-        public static GameObject[] GetAllGameObjects()
+        public static UnityEngine.Object[] GetAllGameObjects()
         {
             try
             {
-                return (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
+                return GameObject.FindObjectsOfType(typeof(MonoBehaviour));
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message); //If theres an error (Such as if no class object is found) print the error and return false
+                return null;
+            }
+        }
+        public static GameObject GetGameObjectWithComponent<comp>()
+        {
+            try
+            {
+                var obj = (GameObject)UnityEngine.Object.FindObjectOfType(typeof(comp));
+                return obj.gameObject;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        public static Component GetComponent<type>()
+        {
+            try
+            {
+                var obj = (GameObject)UnityEngine.Object.FindObjectOfType(typeof(type));
+                return obj.GetComponent(typeof(type));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
                 return null;
             }
         }
@@ -311,7 +274,217 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
     {
         public ModEngineChatMessage(string message, PlayerNetworking.ChatMessageType type)
         {
-            NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+            if (NetworkServer.active)
+            {
+                NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+            }
+            else
+            {
+                NetworkManagerBehavior.myPlayerNetworking.CallCmdCreateMessage(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
+            }
+        }
+    }
+
+    public class ModEngineTextOverlay
+    {
+        public ModEngineTextOverlay(string message)
+        {
+            MouthBehavior componentInChildren2 = ModEngineComponents.GetObjectFromTag("Player").GetComponentInChildren<MouthBehavior>();
+            componentInChildren2.afflictedUI.GetComponent<Text>().text = message;
+            componentInChildren2.afflictedUI.GetComponent<Animator>().SetTrigger("Enable");
+        }
+    }
+
+    public class ModEngineCanvasOverlay
+    {
+        public ModEngineCanvasOverlay(string message, int framesToLast)
+        {
+            TechLogCanvasBehavior.SetDisplayString(message, framesToLast);
+        }
+    }
+    public class ModEngineTextTitle
+    {
+        public ModEngineTextTitle(string message)
+        {
+            GameObject gameObject = GameObject.Find("BoostText");
+            gameObject.GetComponent<Animator>().SetTrigger("Enable");
+            gameObject.GetComponent<Text>().text = message;
+        }
+    }
+
+    public class ModEngineEvents
+    {
+        int prevGold = 0;
+        int prevHealth = 10;
+        int prevMaxHealth = 10;
+        int prevBiome = 0;
+        bool prevDead = false;
+        int prevSubHealth = 0;
+        int prevSubMaxHealth = 0;
+        SubStats prevSubStats = null;
+        bool prevCave = false;
+        bool prevCiv = false;
+        AIDMBehavior prevAIDM = null;
+        float prevBoostJuice = 0f;
+        string prevText = "";
+        int prevBossHealth = 0;
+        GameObject[] prevConnected;
+
+        public bool GoldChange()
+        {
+            if (!(ModEngineVariables.Gold == prevGold))
+            {
+                prevGold = ModEngineVariables.Gold;
+                return true;
+            }
+            return false;
+        }
+        public bool PlayerHealthChange()
+        {
+            if (!(ModEngineVariables.Playerhealth == prevHealth))
+            {
+                prevHealth = ModEngineVariables.Playerhealth;
+                return true;
+            }
+            return false;
+        }
+        public bool PlayerMaxHealthChange()
+        {
+            if (!(ModEngineVariables.PlayerMaxHealth == prevMaxHealth))
+            {
+                prevMaxHealth = ModEngineVariables.PlayerMaxHealth;
+                return true;
+            }
+            return false;
+        }
+        public bool BiomeChange()
+        {
+            if (!(ModEngineVariables.WaterType == prevBiome))
+            {
+                prevBiome = ModEngineVariables.WaterType;
+                return true;
+            }
+            return false;
+        }
+        public bool DeathStatusChange()
+        {
+            if (!(ModEngineVariables.IsDead == prevDead))
+            {
+                prevDead = ModEngineVariables.IsDead;
+                return true;
+            }
+            return false;
+        }
+        public bool SubHealthChange()
+        {
+            if (!(ModEngineVariables.Substats.NetworksubHealth == prevSubHealth))
+            {
+                prevSubHealth = ModEngineVariables.Substats.NetworksubHealth;
+                return true;
+            }
+            return false;
+        }
+        public bool SubMaxHealthChange()
+        {
+            if (!(ModEngineVariables.Substats.NetworkmaxSubHealth == prevSubMaxHealth))
+            {
+                prevSubMaxHealth = ModEngineVariables.Substats.NetworkmaxSubHealth;
+                return true;
+            }
+            return false;
+        }
+        public bool SubStatsChanged()
+        {
+            if (!(ModEngineVariables.Substats == prevSubStats))
+            {
+                prevSubStats = ModEngineVariables.Substats;
+                return true;
+            }
+            return false;
+        }
+        public bool CaveStatusChange()
+        {
+            if (!(AIDMBehavior.inCave == prevCave))
+            {
+                prevCave = AIDMBehavior.inCave;
+                return true;
+            }
+            return false;
+        }
+        public bool CivStatusChange()
+        {
+            if (!(AIDMBehavior.inCiv == prevCiv))
+            {
+                prevCiv = AIDMBehavior.inCiv;
+                return true;
+            }
+            return false;
+        }
+        public bool AIDMChange()
+        {
+            if (!(ModEngineVariables.AIDM == prevAIDM))
+            {
+                prevAIDM = ModEngineVariables.AIDM;
+                return true;
+            }
+            return false;
+        }
+        public bool FuelChange()
+        {
+            if (!(ModEngineVariables.Substats.boostJuice == prevBoostJuice))
+            {
+                prevBoostJuice = ModEngineVariables.Substats.boostJuice;
+                return true;
+            }
+            return false;
+        }
+        public string MessageSent()
+        {
+            try
+            {
+                var input = GameObject.FindObjectOfType<ChatBoxBehavior>().gameObject.GetComponentInChildren<InputField>();
+                if (input == null) return null;
+                var text = input.text;
+                if (text != prevText)
+                {
+                    if (text == null || text == "")
+                    {
+                        if (prevText != null && prevText != "")
+                        {
+                            string data = prevText;
+                            prevText = text;
+                            return data;
+                        }
+                    }
+                    prevText = text;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            return null;
+        }
+        public bool BossHealthChanged()
+        {
+            int health = ModEngineComponents.GetObjectFromTag("Boss").GetComponent<ExteriorEnemyHealth>().Networkhealth;
+            if (!(health == prevBossHealth))
+            {
+                prevBossHealth = health;
+                return true;
+            }
+            return false;
+        }
+        public bool ConnectedPlayersChanged()
+        {
+            var connected = NetworkManagerBehavior.allPlayersInGame;
+            GameObject[] current = connected.ToArray();
+            if (!(current == prevConnected))
+            {
+                prevConnected = current;
+                return true;
+            }
+            return false;
         }
     }
 
@@ -331,5 +504,186 @@ namespace WeNeedToModDeeperEngine //NOTE the types below will be added to the dl
         }
     }
 
-    //TODO: Commands?
+    public class ModEngineNetwork
+    {
+        public ModEngineNetwork()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ModEngineCommands
+    {
+        public static void SpawnCave(Vector3 spawnPos, float rotation, CaveBehavior.CaveType type)
+        {
+            ModEngineVariables.AIDM.SpawnCave(spawnPos, rotation, type);
+        }
+        public static void SpawnTimeTravller(bool needsSaving)
+        {
+            TimeTravelerSpawnPoint[] zones = UnityEngine.Object.FindObjectsOfType<TimeTravelerSpawnPoint>();
+            int randZone = UnityEngine.Random.Range(0, zones.Length);
+            Vector3 spawnPos = zones[randZone].transform.position;
+            GameObject tt = UnityEngine.Object.Instantiate<GameObject>(ModEngineVariables.AIDM.timeTravelerPrefab, spawnPos, Quaternion.identity);
+            TimeTravelerAI_Module timeTravelerAI = tt.GetComponent<TimeTravelerAI_Module>();
+            if (timeTravelerAI != null && needsSaving)
+            {
+                timeTravelerAI.forceGood = true;
+            }
+            NetworkServer.Spawn(tt);
+        }
+        public static void SetItem(ItemSlot slot, ItemType type)
+        {
+            HandleWeapons handleWeps = ModEngineVariables.WeaponsHandler;
+            handleWeps.SetItem(type, slot);
+        }
+        public static void SwitchItems()
+        {
+            HandleWeapons handleWeps = ModEngineVariables.WeaponsHandler;
+            handleWeps.SwitchItems();
+        }
+        public static void ForceFire()
+        {
+            HandleWeapons handleWeps = ModEngineVariables.WeaponsHandler;
+            handleWeps.DoItemAction();
+        }
+    }
+    public class ModEngineSpawns
+    {
+        public static GameObject GetSpawnable(ModEngineSpawnables item)
+        {
+            GameObject toReturn = null;
+            PickupManagerBehavior pm = GameControllerBehavior.pickupManager;
+            foreach (var obj in pm.allConsumableSupplies)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allExteriorWeaponSwaps)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allHandheldItemPickups)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allMercenaries)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allPotions)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allSubUpgrades)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allTorpUpgrades)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            foreach (var obj in pm.allTrash)
+            {
+                if (obj.name == item.ToString()) toReturn = obj;
+            }
+            if (item.ToString() == "GoldPileLarge")
+            {
+                GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(GameControllerBehavior.AIDM.timeTravelerPrefab, GameObject.FindGameObjectWithTag("Player").transform.position, Quaternion.identity);
+                TimeTravelerAI_Module comp = gameObject.GetComponent<TimeTravelerAI_Module>();
+                foreach (var spawn in comp.goodSpawns)
+                {
+                    if (spawn.name == "GoldPileLarge") { toReturn = spawn; }
+                }
+                GameObject.Destroy(gameObject);
+            }
+            //GameObject.Find("CavePopulator").GetComponent<CavePopulatorBehavior>().treasureChestPrefabs
+            return toReturn;
+        }
+        public static void SpawnObject(GameObject prefab, Vector2 pos)
+        {
+            var go = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.identity);
+            var comp = go.GetComponent<ItemPickupBehavior>();
+            if (comp != null) { comp.NetworkshowDeadBody = false; }
+            BackpackPickupBehavior component2 = go.GetComponent<BackpackPickupBehavior>();
+            if (component2 != null) { component2.NetworkshowDeadBody = false; }
+            NetworkServer.Spawn(go);
+        }
+        public static void SpawnTimeTravller(bool needsSaving)
+        {
+            TimeTravelerSpawnPoint[] zones = UnityEngine.Object.FindObjectsOfType<TimeTravelerSpawnPoint>();
+            int randZone = UnityEngine.Random.Range(0, zones.Length);
+            Vector3 spawnPos = zones[randZone].transform.position;
+            GameObject tt = UnityEngine.Object.Instantiate<GameObject>(ModEngineVariables.AIDM.timeTravelerPrefab, spawnPos, Quaternion.identity);
+            TimeTravelerAI_Module timeTravelerAI = tt.GetComponent<TimeTravelerAI_Module>();
+            if (timeTravelerAI != null && needsSaving)
+            {
+                timeTravelerAI.forceGood = true;
+            }
+            NetworkServer.Spawn(tt);
+        }
+        public static void SpawnCave(Vector3 spawnPos, float rotation, CaveBehavior.CaveType type)
+        {
+            ModEngineVariables.AIDM.SpawnCave(spawnPos, rotation, type);
+        }
+    }
+
+    public enum ModEngineSpawnables
+    {
+        FuelBarrel,
+        Barrel,
+        BatteryPickup,
+        ShotgunModPickup,
+        RifleModPickup,
+        obj_ButcherKnifePickup,
+        obj_ChemistryKitPickup,
+        obj_DynamitePickup,
+        obj_eldritchStaffPickup,
+        obj_FlintlockPickup,
+        obj_HealthKitPickup,
+        obj_MonkeyWrenchPickup,
+        obj_PhonographPickup,
+        obj_pickAxePickup,
+        obj_PipeWrenchPickup,
+        obj_PirateSwordPickup,
+        obj_RevolverPickup,
+        obj_RivetGunPickup,
+        obj_RosePickup,
+        obj_SyringePickup,
+        obj_TeslaGunPickup,
+        obj_TranslationBookPickup,
+        obj_WaterPumpPickup,
+        obj_WrenchPickup,
+        BackpackUpgrade,
+        obj_PliersPickup,
+        obj_CivilizationNPC,
+        DamageElixir,
+        HealthElixer,
+        RepairElixir,
+        BulletGrease,
+        CannonUpgrade,
+        EMPDamageUpgrade,
+        EngineUpgrade,
+        HullUpgrade,
+        MaxFuelUpgrade,
+        ShieldUpgrade,
+        AcidModPickup,
+        RocketModPickup,
+        Ln2ModPickup,
+        HomingModPickup,
+        LaserModPickup,
+        HazardousFuelModPickup,
+        DuplicatorModPickup,
+        PoisonElixer,
+        obj_DevSkeleton,
+        obj_BananaPickup,
+        obj_Book,
+        obj_RottenApple,
+        obj_DynamiteSpawner,
+        obj_BrokenSwordPickup,
+        obj_CrabArmPickup,
+        obj_MopPickup,
+        obj_RustyWrenchPickup,
+        TrashAttireUnlock,
+        TrashHatUnlock,
+        GoldPileLarge
+    }
 }
