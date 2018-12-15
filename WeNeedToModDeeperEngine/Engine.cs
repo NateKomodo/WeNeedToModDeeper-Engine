@@ -328,7 +328,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         float prevBoostJuice = 0f;
         string prevText = "";
         int prevBossHealth = 0;
-        GameObject[] prevConnected;
+        GameObject[] prevConnected = new GameObject[1];
 
         public bool GoldChange()
         {
@@ -479,7 +479,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             var connected = NetworkManagerBehavior.allPlayersInGame;
             GameObject[] current = connected.ToArray();
-            if (!(current == prevConnected))
+            if (!current.SequenceEqual(prevConnected))
             {
                 prevConnected = current;
                 return true;
