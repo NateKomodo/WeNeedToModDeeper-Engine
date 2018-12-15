@@ -9,7 +9,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
-        public static string version = "2.7";
+        public static string version = "2.8";
         public static string gameversion = GlobalStats.version;
 
         public static void Main()
@@ -328,7 +328,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         float prevBoostJuice = 0f;
         string prevText = "";
         int prevBossHealth = 0;
-        List<GameObject> prevConnected;
+        GameObject[] prevConnected;
 
         public bool GoldChange()
         {
@@ -478,14 +478,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public bool ConnectedPlayersChanged()
         {
             var connected = NetworkManagerBehavior.allPlayersInGame;
-            var isSame = connected.All(prevConnected.Contains) && connected.Count == prevConnected.Count;
-            if (!isSame)
+            GameObject[] current = connected.ToArray();
+            if (!(current == prevConnected))
             {
-                prevConnected.Clear();
-                foreach (var item in connected)
-                {
-                    prevConnected.Add(item);
-                }
+                prevConnected = current;
                 return true;
             }
             return false;
