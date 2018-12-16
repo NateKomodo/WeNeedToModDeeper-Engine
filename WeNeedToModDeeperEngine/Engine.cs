@@ -9,7 +9,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
-        public static string version = "2.8";
+        public static string version = "2.9";
         public static string gameversion = GlobalStats.version;
 
         public static void Main()
@@ -80,8 +80,8 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static int Playerhealth
         {
-            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth; }
-            set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().playerHealth = value; }
+            get { return NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>().playerHealth; }
+            set { NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>().playerHealth = value; }
         }
         public static SubStats Substats
         {
@@ -90,13 +90,13 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static int PlayerMaxHealth
         {
-            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth; }
-            set { GameObject.FindGameObjectWithTag("Player").GetComponent<HealthController>().maxHealth = value; }
+            get { return NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>().maxHealth; }
+            set { NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>().maxHealth = value; }
         }
         [Obsolete("GlobalStats may not function correctly, recomended you use GlobalStats.Variable instead")]
         public static GlobalStats PlayerStats
         {
-            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<GlobalStats>(); }
+            get { return NetworkManagerBehavior.myLocalPlayer.GetComponent<GlobalStats>(); }
         }
         public static AIDMBehavior AIDM
         {
@@ -113,20 +113,25 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         }
         public static HealthController GetPlayerHealthController
         {
-            get { return ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>(); }
+            get { return NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>(); }
         }
         public static bool IsDead
         {
-            get { return ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>().dead; }
-            set { ModEngineComponents.GetObjectFromTag("Player").GetComponent<HealthController>().dead = value; }
+            get { return NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>().dead; }
+            set { NetworkManagerBehavior.myLocalPlayer.GetComponent<HealthController>().dead = value; }
         }
         public static HandleWeapons WeaponsHandler
         {
-            get { return GameObject.FindGameObjectWithTag("Player").GetComponent<HandleWeapons>(); }
+            get { return NetworkManagerBehavior.myLocalPlayer.GetComponent<HandleWeapons>(); }
         }
         public static Transform GetTransform(string obj)
         {
             return ModEngineComponents.GetObjectFromTag(obj).transform;
+        }
+        public static PlayerNetworking PlayerNetworking
+        {
+            get { return NetworkManagerBehavior.myPlayerNetworking; }
+            set { NetworkManagerBehavior.myPlayerNetworking = value; }
         }
     }
 
