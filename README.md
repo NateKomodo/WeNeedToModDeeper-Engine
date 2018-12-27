@@ -72,4 +72,6 @@ Example: ModEngineCommands.SpawnTimeTravller(0f, 0f, true); forces the time trav
 ## Using and testing plugins
 Simply build the plugin if its yours, or get the dll if its not, and put it in the Plugins folder in your we need to go deeper install folder
 
-A mod manager will be added to the installer soon
+There is now a mod manager built in to the installer you can use to get plugins approved by the devs and myself.
+
+If you wish to have your plugin added to the mod manager, open an issue on the repo [here](https://github.com/NateKomodo/WeNeedToModDeeper-Plugins)
