@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -9,8 +13,57 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
-        public static string version = "2.9";
+        public static string version = "3.0";
         public static string gameversion = GlobalStats.version;
+
+        public static bool HasChecked = false;
+
+        public static void CheckForUpdates()
+        {
+            if (HasChecked) return;
+            HasChecked = true;
+            try
+            {
+                WebClient client = new WebClient();
+                ServicePointManager.ServerCertificateValidationCallback +=
+    (sender, cert, chain, sslPolicyErrors) => true;
+                Stream stream = client.OpenRead("https://raw.githubusercontent.com/NateKomodo/WeNeedToModDeeper-Plugins/master/engine-version.txt");
+                StreamReader reader = new StreamReader(stream);
+                string content = reader.ReadToEnd();
+                string[] lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("#")) continue;
+                    string ver = line.Trim();
+                    if (ver != version)
+                    {
+                        UnityEngine.Debug.LogError("Error: Framework out of date, Current version: " + version + ", latest is: " + ver);
+                        Timer _delayTimer = new Timer();
+                        _delayTimer.Interval = 5000;
+                        _delayTimer.AutoReset = false;
+                        _delayTimer.Elapsed += UpdateNeededCanvas;
+                        _delayTimer.Start();
+                        Process.Start("https://github.com/NateKomodo/WeNeedToModDeeper-installer/releases/latest");
+                        HasChecked = true;
+                    }
+                    HasChecked = true;
+                }
+                HasChecked = true;
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("Error: " + ex.Message
+                    + Environment.NewLine
+                    + ex.StackTrace
+                    + Environment.NewLine
+                    + ex.InnerException);
+            }
+        }
+
+        private static void UpdateNeededCanvas(object sender, ElapsedEventArgs e)
+        {
+            new ModEngineCanvasOverlay("Framework is out of date, please update it. You can install the latest version using the installer (You will need to redownload it.)", 300);
+        }
 
         public static void Main()
         {
@@ -279,6 +332,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public ModEngineChatMessage(string message, PlayerNetworking.ChatMessageType type)
         {
+            if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
             if (NetworkServer.active)
             {
                 NetworkManagerBehavior.myPlayerNetworking.CallRpcSetMessageParameters(message, (int)type, ModEngineComponents.GetInstanceID("Player")); //Send a chat message in any of the fonts
@@ -294,6 +348,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public ModEngineTextOverlay(string message)
         {
+            if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
             MouthBehavior componentInChildren2 = ModEngineComponents.GetObjectFromTag("Player").GetComponentInChildren<MouthBehavior>();
             componentInChildren2.afflictedUI.GetComponent<Text>().text = message;
             componentInChildren2.afflictedUI.GetComponent<Animator>().SetTrigger("Enable");
@@ -304,6 +359,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public ModEngineCanvasOverlay(string message, int framesToLast)
         {
+            if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
             TechLogCanvasBehavior.SetDisplayString(message, framesToLast);
         }
     }
@@ -311,6 +367,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public ModEngineTextTitle(string message)
         {
+            if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
             GameObject gameObject = GameObject.Find("BoostText");
             gameObject.GetComponent<Animator>().SetTrigger("Enable");
             gameObject.GetComponent<Text>().text = message;
@@ -334,6 +391,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         string prevText = "";
         int prevBossHealth = 0;
         GameObject[] prevConnected = new GameObject[1];
+
+        public ModEngineEvents()
+        {
+            if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
+        }
 
         public bool GoldChange()
         {
