@@ -18,6 +18,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.Networking.dll</HintPath>
     </Reference>

@@ -614,6 +614,35 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             handleWeps.DoItemAction();
         }
     }
+    public class ModEngineCustomEnemy
+    {
+        public GameObject gameObject;
+
+        public ModEngineCustomEnemy(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        {
+            Sprite sprite = LoadSpriteFromFile(spriteImageFilePath, unitsPerPixel, spriteType);
+        }
+
+        public Sprite LoadSpriteFromFile(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        {
+            Texture2D texture = LoadTexture(spriteImageFilePath);
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), unitsPerPixel, 0, spriteType);
+        }
+
+        public Texture2D LoadTexture(string FilePath)
+        {
+            Texture2D Tex2D;
+            byte[] FileData;
+            if (File.Exists(FilePath))
+            {
+                FileData = File.ReadAllBytes(FilePath);
+                Tex2D = new Texture2D(2, 2);
+                if (Tex2D.LoadImage(FileData))
+                    return Tex2D;
+            }
+            return null;
+        }
+    }
     public class ModEngineSpawns
     {
         public static GameObject GetSpawnable(ModEngineSpawnables item)
