@@ -618,18 +618,53 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public GameObject gameObject;
 
-        public ModEngineCustomEnemy(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public enum EnemyTemplates
         {
-            Sprite sprite = LoadSpriteFromFile(spriteImageFilePath, unitsPerPixel, spriteType);
+            DUOPUS,
+            SHARK,
+            MINEHAZARD,
+            TURTLE,
+            BUBBLE
         }
 
-        public Sprite LoadSpriteFromFile(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public ModEngineCustomEnemy(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight, EnemyTemplates enemyTemplate, Vector2 spawnPos)
+        {
+            Sprite sprite = LoadSpriteFromFile(spriteImageFilePath, unitsPerPixel, spriteType);
+            if (sprite == null) throw new Exception();
+            switch (enemyTemplate)
+            {
+                case EnemyTemplates.DUOPUS:
+                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_duopus").FirstOrDefault(), spawnPos, Quaternion.identity);
+                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+                    break;
+                case EnemyTemplates.SHARK:
+                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_shark").FirstOrDefault(), spawnPos, Quaternion.identity);
+                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+                    break;
+                case EnemyTemplates.MINEHAZARD:
+                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.barnacleEnemiesEasy.Where(go => go.name == "BarnacleMine").FirstOrDefault(), spawnPos, Quaternion.identity);
+                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+                    break;
+                case EnemyTemplates.TURTLE:
+                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.volcanicEnemiesHard.Where(go => go.name == "VolcanicTortoise").FirstOrDefault(), spawnPos, Quaternion.identity);
+                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+                    break;
+                case EnemyTemplates.BUBBLE:
+                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticHazards.Where(go => go.name == "GiantBubble").FirstOrDefault(), spawnPos, Quaternion.identity);
+                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private Sprite LoadSpriteFromFile(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
             Texture2D texture = LoadTexture(spriteImageFilePath);
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), unitsPerPixel, 0, spriteType);
         }
 
-        public Texture2D LoadTexture(string FilePath)
+        private Texture2D LoadTexture(string FilePath)
         {
             Texture2D Tex2D;
             byte[] FileData;
