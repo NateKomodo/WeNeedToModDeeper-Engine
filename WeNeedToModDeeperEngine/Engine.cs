@@ -616,52 +616,232 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     }
     public class ModEngineCustomEnemy
     {
-        public GameObject gameObject;
+        public readonly GameObject gameObject;
+
+        public GameObject[] injectionPrefabs
+        {
+            get
+            {
+                ExteriorEnemyGrabInjectBehavior inj = gameObject.GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>();
+                if (inj != null)
+                {
+                    return inj.injectionPrefabs;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                ExteriorEnemyGrabInjectBehavior inj = gameObject.GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>();
+                if (inj != null)
+                {
+                    inj.injectionPrefabs = value;
+                }
+            }
+        }
 
         public enum EnemyTemplates
         {
             DUOPUS,
+            PIRATESHIP,
             SHARK,
             MINEHAZARD,
+            ICEHAZARD,
             TURTLE,
-            BUBBLE
+            BUBBLE,
+            ORCA,
+            NARWHAL,
+            STARFISH,
+            BARRACUDA,
+            PENGUIN_INT,
+            STARFISH_INT,
+            HUMANOID_INT
         }
 
-        public ModEngineCustomEnemy(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight, EnemyTemplates enemyTemplate, Vector2 spawnPos)
+        public enum EnemyType
         {
-            Sprite sprite = LoadSpriteFromFile(spriteImageFilePath, unitsPerPixel, spriteType);
-            if (sprite == null) throw new Exception();
-            switch (enemyTemplate)
+            INTERIOR,
+            EXTERIOR
+        }
+
+        public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, params string[] spritesPaths)
+        {
+            try
             {
-                case EnemyTemplates.DUOPUS:
-                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_duopus").FirstOrDefault(), spawnPos, Quaternion.identity);
-                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
-                    break;
-                case EnemyTemplates.SHARK:
-                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_shark").FirstOrDefault(), spawnPos, Quaternion.identity);
-                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
-                    break;
-                case EnemyTemplates.MINEHAZARD:
-                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.barnacleEnemiesEasy.Where(go => go.name == "BarnacleMine").FirstOrDefault(), spawnPos, Quaternion.identity);
-                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
-                    break;
-                case EnemyTemplates.TURTLE:
-                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.volcanicEnemiesHard.Where(go => go.name == "VolcanicTortoise").FirstOrDefault(), spawnPos, Quaternion.identity);
-                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
-                    break;
-                case EnemyTemplates.BUBBLE:
-                    gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticHazards.Where(go => go.name == "GiantBubble").FirstOrDefault(), spawnPos, Quaternion.identity);
-                    gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
-                    break;
-                default:
-                    break;
+            SpriteMeshType spriteType = SpriteMeshType.Tight;
+            List<Sprite> sprites = new List<Sprite>();
+
+            if (type == EnemyType.EXTERIOR)
+            {
+                foreach (string path in spritesPaths)
+                {
+                    Sprite sprite = LoadSpriteFromFile(path, 32, spriteType);
+                    if (sprite != null) sprites.Add(sprite);
+                }
             }
+
+            if (type == EnemyType.INTERIOR)
+            {
+                foreach (string path in spritesPaths)
+                {
+                    Sprite sprite = LoadSpriteFromFile(path, 200, spriteType);
+                    if (sprite != null) sprites.Add(sprite);
+                }
+            }
+
+            if (sprites.Count == 0) return;
+
+                if (type == EnemyType.EXTERIOR)
+                {
+                    int i = 0;
+                    switch (enemyTemplate)
+                    {
+                        case EnemyTemplates.BUBBLE:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticHazards.Where(go => go.name == "GiantBubble").FirstOrDefault());
+                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.DUOPUS:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_duopus").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.MINEHAZARD:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.barnacleEnemiesEasy.Where(go => go.name == "BarnacleMine").FirstOrDefault());
+                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.ICEHAZARD:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesEasy.Where(go => go.name == "IceCrystal").FirstOrDefault());
+                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.NARWHAL:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesEasy.Where(go => go.name == "obj_Narwhal").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.ORCA:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesMedium.Where(go => go.name == "obj_Orca").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.SHARK:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_shark").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.STARFISH:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesEasy.Where(go => go.name == "StarfishExterior").FirstOrDefault());
+                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.TURTLE:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.volcanicEnemiesHard.Where(go => go.name == "VolcanicTortoise").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.BARRACUDA:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.stormyEnemiesEasy.Where(go => go.name == "obj_barracuda").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.PIRATESHIP:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.stormyEnemiesMedium.Where(go => go.name == "PirateShipEnemy").FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        default:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_shark").FirstOrDefault());
+                            break;
+                    }
+                }
+                if (type == EnemyType.INTERIOR)
+                {
+                    int i = 0;
+                    switch (enemyTemplate)
+                    {
+                        case EnemyTemplates.HUMANOID_INT:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.stormyEnemiesMedium.Where(go => go.name == "PirateShipEnemy").FirstOrDefault().GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs.FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.PENGUIN_INT:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesMedium.Where(go => go.name == "PenguinExterior").FirstOrDefault().GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs.FirstOrDefault());
+                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                            {
+                                renderer.sprite = sprites[i];
+                                i++;
+                            }
+                            gameObject.SetActive(false);
+                            break;
+                        case EnemyTemplates.STARFISH_INT:
+                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesMedium.Where(go => go.name == "PenguinExterior").FirstOrDefault().GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs.FirstOrDefault());
+                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
+                            gameObject.SetActive(false);
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("ModEngine Error while creating custom enemy (Are sprite paths correct and are there the right amount for the template?): " + ex.Message);
+                gameObject = null;
+                return;
+            }
+        }
+
+        public GameObject InstanciateGameObject(Vector2 position)
+        {
+            return GameObject.Instantiate<GameObject>(gameObject, position, Quaternion.identity);
         }
 
         private Sprite LoadSpriteFromFile(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
-            Texture2D texture = LoadTexture(spriteImageFilePath);
-            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), unitsPerPixel, 0, spriteType);
+            try
+            {
+                Texture2D texture = LoadTexture(spriteImageFilePath);
+                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), unitsPerPixel, 0, spriteType);
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("ModEngine Error while loading sprite: " + ex.Message);
+                return null;
+            }
         }
 
         private Texture2D LoadTexture(string FilePath)
