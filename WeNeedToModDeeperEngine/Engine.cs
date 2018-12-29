@@ -13,7 +13,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngine
     {
-        public static string version = "3.0";
+        public static string version = "3.1";
         public static string gameversion = GlobalStats.version;
 
         public static bool HasChecked = false;
