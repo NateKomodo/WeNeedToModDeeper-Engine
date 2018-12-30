@@ -742,7 +742,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.SHARK:
-                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_shark"));
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -783,7 +783,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         default:
-                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_shark"));
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark"));
                             break;
                     }
                 }
@@ -811,7 +811,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.STARFISH_INT:
-                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0]);
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0]);
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             gameObject.SetActive(false);
                             break;
@@ -832,6 +832,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             {
                 if (go.name == name) return go;
             }
+            UnityEngine.Debug.LogError("Did not find requested item " + name);
             return null;
         }
 
