@@ -60,6 +60,8 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 
         public Dictionary<string, Sprite> Sprites = new Dictionary<string, Sprite>();
 
+        public Dictionary<string, Vector2> Offsets = new Dictionary<string, Vector2>();
+
         private int units;
 
         public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, string name)
@@ -127,6 +129,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 }
                 gameObject.name = name;
                 PopulateSprites();
+                PopulateOffsets();
             }
             catch (Exception ex)
             {
@@ -144,6 +147,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
         }
 
+        private void PopulateOffsets()
+        {
+            foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
+            {
+                Offsets.Add(render.gameObject.name, render.material.mainTextureOffset);
+            }
+        }
+
         public void UpdateSprites()
         {
             foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
@@ -154,6 +165,21 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     if (entry.Key == name)
                     {
                         render.sprite = entry.Value;
+                    }
+                }
+            }
+        }
+
+        public void UpdateOffsets()
+        {
+            foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
+            {
+                var name = render.gameObject.name;
+                foreach (var entry in Offsets)
+                {
+                    if (entry.Key == name)
+                    {
+                        render.material.mainTextureOffset = entry.Value;
                     }
                 }
             }
