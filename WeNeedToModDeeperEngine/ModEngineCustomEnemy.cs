@@ -8,7 +8,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 {
     public class ModEngineCustomEnemy
     {
-        public readonly GameObject gameObject;
+        public GameObject gameObject;
 
         public GameObject[] InjectionPrefabs
         {
@@ -58,109 +58,51 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             EXTERIOR
         }
 
-        public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, string name, params string[] spritesPaths)
+        public Dictionary<string, Sprite> Sprites = new Dictionary<string, Sprite>();
+
+        private int units;
+
+        public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, string name)
         {
             try
             {
-                SpriteMeshType spriteType = SpriteMeshType.Tight;
-                List<Sprite> sprites = new List<Sprite>();
-
                 if (type == EnemyType.EXTERIOR)
                 {
-                    foreach (string path in spritesPaths)
-                    {
-                        Sprite sprite = LoadSpriteFromFile(path, 32, spriteType);
-                        if (sprite != null) sprites.Add(sprite);
-                    }
-                }
-
-                if (type == EnemyType.INTERIOR)
-                {
-                    foreach (string path in spritesPaths)
-                    {
-                        Sprite sprite = LoadSpriteFromFile(path, 200, spriteType);
-                        if (sprite != null) sprites.Add(sprite);
-                    }
-                }
-
-                if (sprites.Count == 0) return;
-
-                if (type == EnemyType.EXTERIOR)
-                {
-                    int i = 0;
+                    units = 32;
                     switch (enemyTemplate)
                     {
                         case EnemyTemplates.BUBBLE:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticHazards, "GiantBubble");
-                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             break;
                         case EnemyTemplates.DUOPUS:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_duopus");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.MINEHAZARD:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.barnacleEnemiesEasy, "BarnacleMine");
-                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             break;
                         case EnemyTemplates.ICEHAZARD:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesEasy, "IceCrystal");
-                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             break;
                         case EnemyTemplates.NARWHAL:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesEasy, "obj_Narwhal");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.ORCA:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "obj_Orca");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.SHARK:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.STARFISH:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior");
-                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             break;
                         case EnemyTemplates.TURTLE:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.volcanicEnemiesHard, "VolcanicTortoise");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.BARRACUDA:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesEasy, "obj_barracuda");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.PIRATESHIP:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         default:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
@@ -169,38 +111,51 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 }
                 if (type == EnemyType.INTERIOR)
                 {
-                    int i = 0;
+                    units = 200;
                     switch (enemyTemplate)
                     {
                         case EnemyTemplates.HUMANOID_INT:
                             gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.PENGUIN_INT:
                             gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior");
-                            foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                            {
-                                renderer.sprite = sprites[i];
-                                i++;
-                            }
                             break;
                         case EnemyTemplates.STARFISH_INT:
                             gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior");
-                            gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             break;
                     }
                 }
                 gameObject.name = name;
+                PopulateSprites();
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError("ModEngine Error while creating custom enemy (Are sprite paths correct and are there the right amount for the template?): " + ex.Message);
+                UnityEngine.Debug.LogError("ModEngine Error while creating custom enemy (Is AIDM active?): " + ex.Message);
                 gameObject = null;
                 return;
+            }
+        }
+
+        private void PopulateSprites()
+        {
+            foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
+            {
+                Sprites.Add(render.gameObject.name, render.sprite);
+            }
+        }
+
+        public void UpdateSprites()
+        {
+            foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
+            {
+                var name = render.gameObject.name;
+                foreach (var entry in Sprites)
+                {
+                    if (entry.Key == name)
+                    {
+                        render.sprite = entry.Value;
+                    }
+                }
             }
         }
 
@@ -232,12 +187,12 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             return go;
         }
 
-        private Sprite LoadSpriteFromFile(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public Sprite LoadSpriteFromFile(string spriteImageFilePath, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
             try
             {
                 Texture2D texture = LoadTexture(spriteImageFilePath);
-                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), unitsPerPixel, 0, spriteType);
+                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), units, 0, spriteType);
             }
             catch (Exception ex)
             {
@@ -258,6 +213,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     return Tex2D;
             }
             return null;
+        }
+
+        public void AttachToGameObject(GameObject go, EnemyType type)
+        {
+            gameObject = go;
+            Sprites.Clear();
+            PopulateSprites();
+            if (type == EnemyType.EXTERIOR) { units = 32; } else { units = 200; }
         }
     }
 }
