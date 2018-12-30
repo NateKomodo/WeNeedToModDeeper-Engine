@@ -224,11 +224,21 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
             {
                 var name = render.gameObject.name;
+                var pivot = render.sprite.pivot;
                 foreach (var entry in Sprites)
                 {
                     if (entry.Key == name)
                     {
-                        render.sprite = entry.Value;
+                        var sprite = entry.Value;
+                        var texture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
+                        var pixels = sprite.texture.GetPixels((int)sprite.textureRect.x,
+                                                                (int)sprite.textureRect.y,
+                                                                (int)sprite.textureRect.width,
+                                                                (int)sprite.textureRect.height);
+                        texture.SetPixels(pixels);
+                        texture.Apply();
+                        var newSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), pivot, units, 0, SpriteMeshType.Tight);
+                        render.sprite = newSprite;
                     }
                 }
             }
