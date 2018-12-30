@@ -151,7 +151,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
             {
-                Offsets.Add(render.gameObject.name, render.material.mainTextureOffset);
+                Offsets.Add(render.gameObject.name, render.material.GetTextureOffset("_MainTex"));
             }
         }
 
