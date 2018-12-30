@@ -45,11 +45,13 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             BUBBLE,
             ORCA,
             NARWHAL,
+            PENGUIN,
             STARFISH,
             BARRACUDA,
             PENGUIN_INT,
             STARFISH_INT,
-            HUMANOID_INT
+            HUMANOID_INT,
+            MONOBODY
         }
 
         public enum EnemyType
@@ -63,6 +65,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public Dictionary<string, Vector2> Offsets = new Dictionary<string, Vector2>();
 
         private int units;
+
+        public readonly bool isMonobodyExt = false;
+
+        public readonly bool isMonobodyInt = false;
 
         public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, string name)
         {
@@ -106,6 +112,13 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                         case EnemyTemplates.PIRATESHIP:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy");
                             break;
+                        case EnemyTemplates.PENGUIN:
+                            gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior");
+                            break;
+                        case EnemyTemplates.MONOBODY:
+                            NewMonobody(type);
+                            isMonobodyExt = true;
+                            break;
                         default:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
                             break;
@@ -122,12 +135,17 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                         case EnemyTemplates.PENGUIN_INT:
                             gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior");
                             break;
+                        case EnemyTemplates.MONOBODY:
+                            NewMonobody(type);
+                            isMonobodyInt = true;
+                            break;
                         case EnemyTemplates.STARFISH_INT:
                             gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior");
                             break;
                     }
                 }
                 gameObject.name = name;
+                if (isMonobodyExt || isMonobodyInt) return;
                 PopulateSprites();
                 PopulateOffsets();
             }
@@ -136,6 +154,52 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 UnityEngine.Debug.LogError("ModEngine Error while creating custom enemy (Is AIDM active?): " + ex.Message);
                 gameObject = null;
                 return;
+            }
+        }
+
+        private void NewMonobody(EnemyType type)
+        {
+            if (type == EnemyType.EXTERIOR)
+            {
+                units = 32;
+                gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
+                PopulateSprites();
+                foreach (var entry in Sprites)
+                {
+                    if (entry.Key != "SharkBody")
+                    {
+                        Sprites[entry.Key] = null;
+                    }
+                }
+                UpdateSprites();
+                foreach (var entry in Sprites)
+                {
+                    if (entry.Key != "SharkBody")
+                    {
+                        Sprites.Remove(entry.Key);
+                    }
+                }
+            }
+            if (type == EnemyType.INTERIOR)
+            {
+                units = 200;
+                gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior");
+                PopulateSprites();
+                foreach (var entry in Sprites)
+                {
+                    if (entry.Key != "PenguinInteriorBody")
+                    {
+                        Sprites[entry.Key] = null;
+                    }
+                }
+                UpdateSprites();
+                foreach (var entry in Sprites)
+                {
+                    if (entry.Key != "PenguinInteriorBody")
+                    {
+                        Sprites.Remove(entry.Key);
+                    }
+                }
             }
         }
 
@@ -151,7 +215,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
             {
-                Offsets.Add(render.gameObject.name, render.material.GetTextureOffset("_MainTex"));
+                Offsets.Add(render.gameObject.name, render.material.mainTextureOffset);
             }
         }
 
