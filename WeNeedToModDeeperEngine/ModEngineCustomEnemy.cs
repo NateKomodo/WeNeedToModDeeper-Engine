@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mod makers can choose to include
 {
@@ -172,7 +173,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     switch (enemyTemplate)
                     {
                         case EnemyTemplates.HUMANOID_INT:
-                            gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0];
+                            gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy");
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -180,7 +181,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             }
                             break;
                         case EnemyTemplates.PENGUIN_INT:
-                            gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0];
+                            gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior");
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -188,7 +189,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             }
                             break;
                         case EnemyTemplates.STARFISH_INT:
-                            gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0];
+                            gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior");
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             break;
                     }
@@ -203,11 +204,21 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
         }
 
+        private GameObject GetInjectObjectFromArray(GameObject[] array, string name)
+        {
+            foreach (var go in array)
+            {
+                if (go.name == name) return GameObject.Instantiate<GameObject>(go.GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0]);
+            }
+            UnityEngine.Debug.LogError("Did not find requested item " + name);
+            return null;
+        }
+
         private GameObject GetObjectFromArray(GameObject[] array, string name)
         {
             foreach (var go in array)
             {
-                if (go.name == name) return go;
+                if (go.name == name) return GameObject.Instantiate<GameObject>(go);
             }
             UnityEngine.Debug.LogError("Did not find requested item " + name);
             return null;
@@ -216,7 +227,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public GameObject InstanciateGameObject(Vector2 position)
         {
             UnityEngine.Debug.Log("Instanciating custom game object: " + gameObject.name + " at: " + position.x + " " + position.y);
-            return GameObject.Instantiate<GameObject>(gameObject, position, Quaternion.identity);
+            GameObject go = GameObject.Instantiate<GameObject>(gameObject, position, Quaternion.identity);
+            NetworkServer.Spawn(go);
+            return go;
         }
 
         private Sprite LoadSpriteFromFile(string spriteImageFilePath, int unitsPerPixel, SpriteMeshType spriteType = SpriteMeshType.Tight)
