@@ -229,6 +229,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 {
                     if (entry.Key == name)
                     {
+                        if (entry.Key == null) { render.sprite = null; continue; }
                         var sprite = entry.Value;
                         var texture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
                         var pixels = sprite.texture.GetPixels((int)sprite.textureRect.x,
