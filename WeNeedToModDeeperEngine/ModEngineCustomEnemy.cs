@@ -286,7 +286,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             try
             {
                 Texture2D texture = LoadTexture(spriteImageFilePath);
-                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), pivot, units, 0, spriteType);
+                int width = texture.width;
+                int height = texture.height;
+                return Sprite.Create(texture, new Rect(0, 0, width, height), pivot, units, 0, spriteType);
             }
             catch (Exception ex)
             {
