@@ -277,12 +277,12 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             return go;
         }
 
-        public Sprite LoadSpriteFromFile(string spriteImageFilePath, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public Sprite LoadSpriteFromFile(string spriteImageFilePath, Vector2 pivot, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
             try
             {
                 Texture2D texture = LoadTexture(spriteImageFilePath);
-                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), units, 0, spriteType);
+                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), pivot, units, 0, spriteType);
             }
             catch (Exception ex)
             {
