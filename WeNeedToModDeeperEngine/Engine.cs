@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Timers;
 using UnityEngine;
@@ -38,9 +37,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     if (ver != version)
                     {
                         UnityEngine.Debug.LogError("Error: Framework out of date, Current version: " + version + ", latest is: " + ver);
-                        Timer _delayTimer = new Timer();
-                        _delayTimer.Interval = 5000;
-                        _delayTimer.AutoReset = false;
+                        Timer _delayTimer = new Timer
+                        {
+                            Interval = 5000,
+                            AutoReset = false
+                        };
                         _delayTimer.Elapsed += UpdateNeededCanvas;
                         _delayTimer.Start();
                         Process.Start("https://github.com/NateKomodo/WeNeedToModDeeper-installer/releases/latest");
@@ -546,7 +547,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             var connected = NetworkManagerBehavior.allPlayersInGame;
             GameObject[] current = connected.ToArray();
-            if (!current.SequenceEqual(prevConnected))
+            if (current != prevConnected)
             {
                 prevConnected = current;
                 return true;
@@ -618,7 +619,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
     {
         public readonly GameObject gameObject;
 
-        public GameObject[] injectionPrefabs
+        public GameObject[] InjectionPrefabs
         {
             get
             {
@@ -699,12 +700,12 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     switch (enemyTemplate)
                     {
                         case EnemyTemplates.BUBBLE:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticHazards.Where(go => go.name == "GiantBubble").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticHazards, "GiantBubble"));
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.DUOPUS:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_duopus").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_duopus"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -713,17 +714,17 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.MINEHAZARD:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.barnacleEnemiesEasy.Where(go => go.name == "BarnacleMine").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.barnacleEnemiesEasy, "BarnacleMine"));
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.ICEHAZARD:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesEasy.Where(go => go.name == "IceCrystal").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesEasy, "IceCrystal"));
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.NARWHAL:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesEasy.Where(go => go.name == "obj_Narwhal").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesEasy, "obj_Narwhal"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -732,7 +733,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.ORCA:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesMedium.Where(go => go.name == "obj_Orca").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "obj_Orca"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -741,7 +742,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.SHARK:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_shark").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_shark"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -750,12 +751,12 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.STARFISH:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesEasy.Where(go => go.name == "StarfishExterior").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior"));
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.TURTLE:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.volcanicEnemiesHard.Where(go => go.name == "VolcanicTortoise").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.volcanicEnemiesHard, "VolcanicTortoise"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -764,7 +765,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.BARRACUDA:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.stormyEnemiesEasy.Where(go => go.name == "obj_barracuda").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesEasy, "obj_barracuda"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -773,7 +774,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.PIRATESHIP:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.stormyEnemiesMedium.Where(go => go.name == "PirateShipEnemy").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy"));
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -782,7 +783,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         default:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.atlanticEnemiesMedium.Where(go => go.name == "obj_shark").FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_shark"));
                             break;
                     }
                 }
@@ -792,7 +793,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     switch (enemyTemplate)
                     {
                         case EnemyTemplates.HUMANOID_INT:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.stormyEnemiesMedium.Where(go => go.name == "PirateShipEnemy").FirstOrDefault().GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs.FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0]);
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -801,7 +802,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.PENGUIN_INT:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesMedium.Where(go => go.name == "PenguinExterior").FirstOrDefault().GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs.FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0]);
                             foreach (var renderer in gameObject.GetComponentsInChildren<SpriteRenderer>())
                             {
                                 renderer.sprite = sprites[i];
@@ -810,7 +811,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                             gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.STARFISH_INT:
-                            gameObject = GameObject.Instantiate<GameObject>(GameControllerBehavior.AIDM.arcticEnemiesMedium.Where(go => go.name == "PenguinExterior").FirstOrDefault().GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs.FirstOrDefault());
+                            gameObject = GameObject.Instantiate<GameObject>(GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0]);
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
                             gameObject.SetActive(false);
                             break;
@@ -823,6 +824,15 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 gameObject = null;
                 return;
             }
+        }
+
+        private GameObject GetObjectFromArray(GameObject[] array, string name)
+        {
+            foreach (var go in array)
+            {
+                if (go.name == name) return go;
+            }
+            return null;
         }
 
         public GameObject InstanciateGameObject(Vector2 position)
