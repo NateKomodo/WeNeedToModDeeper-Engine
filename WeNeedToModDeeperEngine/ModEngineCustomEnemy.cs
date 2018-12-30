@@ -61,28 +61,28 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             try
             {
-            SpriteMeshType spriteType = SpriteMeshType.Tight;
-            List<Sprite> sprites = new List<Sprite>();
+                SpriteMeshType spriteType = SpriteMeshType.Tight;
+                List<Sprite> sprites = new List<Sprite>();
 
-            if (type == EnemyType.EXTERIOR)
-            {
-                foreach (string path in spritesPaths)
+                if (type == EnemyType.EXTERIOR)
                 {
-                    Sprite sprite = LoadSpriteFromFile(path, 32, spriteType);
-                    if (sprite != null) sprites.Add(sprite);
+                    foreach (string path in spritesPaths)
+                    {
+                        Sprite sprite = LoadSpriteFromFile(path, 32, spriteType);
+                        if (sprite != null) sprites.Add(sprite);
+                    }
                 }
-            }
 
-            if (type == EnemyType.INTERIOR)
-            {
-                foreach (string path in spritesPaths)
+                if (type == EnemyType.INTERIOR)
                 {
-                    Sprite sprite = LoadSpriteFromFile(path, 200, spriteType);
-                    if (sprite != null) sprites.Add(sprite);
+                    foreach (string path in spritesPaths)
+                    {
+                        Sprite sprite = LoadSpriteFromFile(path, 200, spriteType);
+                        if (sprite != null) sprites.Add(sprite);
+                    }
                 }
-            }
 
-            if (sprites.Count == 0) return;
+                if (sprites.Count == 0) return;
 
                 if (type == EnemyType.EXTERIOR)
                 {
