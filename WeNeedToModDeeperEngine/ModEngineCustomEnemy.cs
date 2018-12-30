@@ -164,7 +164,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 units = 32;
                 gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
                 PopulateSprites();
-                foreach (var entry in Sprites)
+                Dictionary<string, Sprite> Sprites2 = new Dictionary<string, Sprite>();
+                foreach (var entry in Sprites) Sprites2.Add(entry.Key, entry.Value);
+                foreach (var entry in Sprites2)
                 {
                     if (entry.Key != "SharkBody")
                     {
@@ -172,7 +174,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     }
                 }
                 UpdateSprites();
-                foreach (var entry in Sprites)
+                foreach (var entry in Sprites2)
                 {
                     if (entry.Key != "SharkBody")
                     {
@@ -185,7 +187,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 units = 200;
                 gameObject = GetInjectObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior");
                 PopulateSprites();
-                foreach (var entry in Sprites)
+                Dictionary<string, Sprite> Sprites2 = new Dictionary<string, Sprite>();
+                foreach (var entry in Sprites) Sprites2.Add(entry.Key, entry.Value);
+                foreach (var entry in Sprites2)
                 {
                     if (entry.Key != "PenguinInteriorBody")
                     {
@@ -193,7 +197,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                     }
                 }
                 UpdateSprites();
-                foreach (var entry in Sprites)
+                foreach (var entry in Sprites2)
                 {
                     if (entry.Key != "PenguinInteriorBody")
                     {
