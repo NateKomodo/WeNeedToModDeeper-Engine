@@ -57,7 +57,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             EXTERIOR
         }
 
-        public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, params string[] spritesPaths)
+        public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, string name, params string[] spritesPaths)
         {
             try
             {
@@ -92,7 +92,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                         case EnemyTemplates.BUBBLE:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticHazards, "GiantBubble");
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.DUOPUS:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesMedium, "obj_duopus");
@@ -101,17 +100,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.MINEHAZARD:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.barnacleEnemiesEasy, "BarnacleMine");
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.ICEHAZARD:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesEasy, "IceCrystal");
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.NARWHAL:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesEasy, "obj_Narwhal");
@@ -120,7 +116,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.ORCA:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "obj_Orca");
@@ -129,7 +124,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.SHARK:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
@@ -138,12 +132,10 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.STARFISH:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior");
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.TURTLE:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.volcanicEnemiesHard, "VolcanicTortoise");
@@ -152,7 +144,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.BARRACUDA:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesEasy, "obj_barracuda");
@@ -161,7 +152,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.PIRATESHIP:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.stormyEnemiesMedium, "PirateShipEnemy");
@@ -170,7 +160,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         default:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "obj_shark");
@@ -189,7 +178,6 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.PENGUIN_INT:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.arcticEnemiesMedium, "PenguinExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0];
@@ -198,15 +186,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                                 renderer.sprite = sprites[i];
                                 i++;
                             }
-                            gameObject.SetActive(false);
                             break;
                         case EnemyTemplates.STARFISH_INT:
                             gameObject = GetObjectFromArray(GameControllerBehavior.AIDM.atlanticEnemiesEasy, "StarfishExterior").GetComponentInChildren<ExteriorEnemyGrabInjectBehavior>().injectionPrefabs[0];
                             gameObject.GetComponentInChildren<SpriteRenderer>().sprite = sprites[0];
-                            gameObject.SetActive(false);
                             break;
                     }
                 }
+                gameObject.name = name;
             }
             catch (Exception ex)
             {
@@ -228,6 +215,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 
         public GameObject InstanciateGameObject(Vector2 position)
         {
+            UnityEngine.Debug.Log("Instanciating custom game object: " + gameObject.name + " at: " + position.x + " " + position.y);
             return GameObject.Instantiate<GameObject>(gameObject, position, Quaternion.identity);
         }
 
