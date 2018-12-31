@@ -24,7 +24,7 @@ namespace WeNeedToModDeeperEngine
             gameObject = target;
             PopulateSprites();
             if (type == EnemyType.EXTERIOR) units = 32;
-            if (type == EnemyType.EXTERIOR) units = 200;
+            if (type == EnemyType.INTERIOR) units = 200;
         }
 
         private void PopulateSprites()
