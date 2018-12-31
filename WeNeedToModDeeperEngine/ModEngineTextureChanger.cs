@@ -56,7 +56,7 @@ namespace WeNeedToModDeeperEngine
                 }
             }
         }
-        public Sprite LoadSpriteFromFile(string spriteImageFilePath, Vector2 pivot, Sprite spritePivotToCopy = null, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public Sprite LoadSpriteFromFile(string spriteImageFilePath, Vector2 pivot, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
             if (spritePivotToCopy != null) pivot = spritePivotToCopy.pivot;
             try
