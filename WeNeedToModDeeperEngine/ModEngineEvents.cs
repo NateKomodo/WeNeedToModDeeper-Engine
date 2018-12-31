@@ -183,5 +183,20 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
             return false;
         }
+        public bool KeyPressed(KeyCode key)
+        {
+            if (Input.GetKeyDown(key)) return true;
+            return false;
+        }
+        public bool KeyReleased(KeyCode key)
+        {
+            if (Input.GetKeyUp(key)) return true;
+            return false;
+        }
+        public bool KeyHeld(KeyCode key)
+        {
+            if (Input.GetKey(key)) return true;
+            return false;
+        }
     }
 }
