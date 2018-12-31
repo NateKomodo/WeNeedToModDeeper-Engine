@@ -34,6 +34,21 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             }
         }
 
+        public int Health
+        {
+            get
+            {
+                if (type == EnemyType.EXTERIOR) return gameObject.GetComponent<ExteriorEnemyHealth>().Networkhealth;
+                if (type == EnemyType.INTERIOR) return gameObject.GetComponent<InteriorEnemyDamageController>().Networkhealth;
+                return -1;
+            }
+            set
+            {
+                if (type == EnemyType.EXTERIOR) gameObject.GetComponent<ExteriorEnemyHealth>().Networkhealth = value;
+                if (type == EnemyType.INTERIOR) gameObject.GetComponent<InteriorEnemyDamageController>().Networkhealth = value;
+            }
+        }
+
         public enum EnemyTemplates
         {
             DUOPUS,
@@ -70,8 +85,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 
         public readonly bool isMonobodyInt = false;
 
-        public ModEngineCustomEnemy(EnemyType type, EnemyTemplates enemyTemplate, string name)
+        private EnemyType type;
+
+        public ModEngineCustomEnemy(EnemyType entype, EnemyTemplates enemyTemplate, string name)
         {
+            type = entype;
             try
             {
                 if (type == EnemyType.EXTERIOR)
@@ -211,7 +229,14 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
             {
-                Sprites.Add(render.gameObject.name, render.sprite);
+                try
+                {
+                    Sprites.Add(render.gameObject.name, render.sprite);
+                }
+                catch
+                {
+                    Debug.LogError("Mod engine error: Sprite already in dictionary, continuing");
+                }
             }
         }
 

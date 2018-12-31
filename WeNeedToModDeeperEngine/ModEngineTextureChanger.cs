@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using UnityEngine;
 
 namespace WeNeedToModDeeperEngine
@@ -32,7 +31,14 @@ namespace WeNeedToModDeeperEngine
         {
             foreach (var render in gameObject.GetComponentsInChildren<SpriteRenderer>())
             {
-                Sprites.Add(render.gameObject.name, render.sprite);
+                try
+                {
+                    Sprites.Add(render.gameObject.name, render.sprite);
+                }
+                catch
+                {
+                    Debug.LogError("Mod engine error: Sprite already in dictionary, continuing");
+                }
             }
         }
 
