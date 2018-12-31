@@ -58,7 +58,6 @@ namespace WeNeedToModDeeperEngine
         }
         public Sprite LoadSpriteFromFile(string spriteImageFilePath, Vector2 pivot, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
-            if (spritePivotToCopy != null) pivot = spritePivotToCopy.pivot;
             try
             {
                 Texture2D texture = LoadTexture(spriteImageFilePath);
