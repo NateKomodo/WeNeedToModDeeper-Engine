@@ -281,8 +281,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             return go;
         }
 
-        public Sprite LoadSpriteFromFile(string spriteImageFilePath, Vector2 pivot, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public Sprite LoadSpriteFromFile(string spriteImageFilePath, Vector2 pivot, Sprite spritePivotToCopy = null, SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
+            if (spritePivotToCopy != null) pivot = spritePivotToCopy.pivot;
             try
             {
                 Texture2D texture = LoadTexture(spriteImageFilePath);
@@ -311,12 +312,72 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             return null;
         }
 
-        public void AttachToGameObject(GameObject go, EnemyType type)
+        public void ChangeGameObject(GameObject go, EnemyType type)
         {
             gameObject = go;
             Sprites.Clear();
             PopulateSprites();
             if (type == EnemyType.EXTERIOR) { units = 32; } else { units = 200; }
+        }
+
+        public void AttachToParent(GameObject parent)
+        {
+            gameObject.transform.parent = parent.transform;
+        }
+
+        public void AttachChild(GameObject child)
+        {
+            child.transform.parent = gameObject.transform;
+        }
+
+        public GameObject[] GetAllChildren()
+        {
+            List<GameObject> children = new List<GameObject>();
+            foreach (Transform child in gameObject.transform)
+            {
+                children.Add(child.gameObject);
+            }
+            return children.ToArray();
+        }
+
+        public GameObject GetParent()
+        {
+            return gameObject.transform.parent.gameObject;
+        }
+
+        public Component GetComponent<comp>()
+        {
+            return gameObject.GetComponent(typeof(comp));
+        }
+
+        public Component GetComponentInChildren<comp>()
+        {
+            return gameObject.GetComponentInChildren(typeof(comp));
+        }
+
+        public Component GetComponentInParent<comp>()
+        {
+            return gameObject.GetComponentInParent(typeof(comp));
+        }
+
+        public Component[] GetComponents<comp>()
+        {
+            return gameObject.GetComponents(typeof(comp));
+        }
+
+        public Component[] GetComponentsInChildren<comp>()
+        {
+            return gameObject.GetComponentsInChildren(typeof(comp));
+        }
+
+        public Component[] GetComponentsInParent<comp>()
+        {
+            return gameObject.GetComponentsInParent(typeof(comp));
+        }
+
+        public void AddComponent<comp>()
+        {
+            gameObject.AddComponent(typeof(comp));
         }
     }
 }
