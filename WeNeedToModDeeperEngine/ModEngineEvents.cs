@@ -34,7 +34,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public string[] MessageSentV2()
         {
             var messages = GameObject.FindObjectsOfType<ChatTextColorPicker>();
-            if (messages == null) return;
+            if (messages == null) return null;
             foreach (var message in messages)
             {
                 var text = message.gameObject.GetComponentInChildren<Text>().text;
