@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Steamworks;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -118,6 +119,50 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             get { return NetworkManagerBehavior.myPlayerNetworking; }
             set { NetworkManagerBehavior.myPlayerNetworking = value; }
+        }
+        public static GameObject GetPlayerByIGN(string ign)
+        {
+            var connected = ModEngineVariables.PlayersInGame;
+            foreach (var player in connected)
+            {
+                if (player.GetComponent<PlayerIdentification>().playerName == ign) return player;
+            }
+            return null;
+        }
+
+        public static GameObject GetPlayerBySteamName(string steamName)
+        {
+            var connected = ModEngineVariables.PlayersInGame;
+            foreach (var player in connected)
+            {
+                if (player.GetComponent<PlayerIdentification>().playerSteamName == steamName) return player;
+            }
+            return null;
+        }
+
+        public static GameObject GetPlayerBySteamID(CSteamID id)
+        {
+            var connected = ModEngineVariables.PlayersInGame;
+            foreach (var player in connected)
+            {
+                if (player.GetComponent<PlayerIdentification>().mySteamID == id) return player;
+            }
+            return null;
+        }
+
+        public static string GetPlayerName(GameObject player)
+        {
+            return player.GetComponent<PlayerIdentification>().playerName;
+        }
+
+        public static string GetPlayerSteamName(GameObject player)
+        {
+            return player.GetComponent<PlayerIdentification>().playerSteamName;
+        }
+
+        public static CSteamID GetPlayerSteamID(GameObject player)
+        {
+            return player.GetComponent<PlayerIdentification>().mySteamID;
         }
     }
 }

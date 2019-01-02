@@ -21,10 +21,27 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         string prevText = "";
         int prevBossHealth = 0;
         GameObject[] prevConnected = new GameObject[1];
+        LobbyManagerBehavior prevLobby = null;
+        int prevSceneBuildIndex = -1;
 
         public ModEngineEvents()
         {
             if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
+        }
+
+        public bool SceneChanged()
+        {
+            var scene = new ModEngineSceneManager();
+            int current = scene.GetCurrentSceneIndex();
+            if (prevSceneBuildIndex != current) return true;
+            return false;
+        }
+
+        public bool LobbyInitialized()
+        {
+            LobbyManagerBehavior lobby = GameObject.FindObjectOfType<LobbyManagerBehavior>();
+            if (lobby != null && prevLobby == null) return true;
+            return false;
         }
 
         public bool GoldChange()
