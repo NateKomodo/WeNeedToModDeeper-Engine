@@ -88,28 +88,6 @@ namespace WeNeedToModDeeperEngine
             return null;
         }
     }
-    
-    public class ModEngineButton
-    {
-        public GameObject myButton;
-
-        public ModEngineButton(Vector2 position, Vector2 size, UnityAction method, Sprite sprite, Transform parent = null)
-        {
-            GameObject go = new GameObject("Textured button (" + sprite.name + ")");
-            Image image = go.AddComponent<Image>();
-            image.sprite = sprite;
-            Button button = go.AddComponent<Button>();
-            button.onClick.AddListener(method);
-            if (parent != null) go.transform.parent = parent;
-            image.rectTransform.sizeDelta = size;
-            myButton = go;
-        }
-
-        public void Destroy()
-        {
-            GameObject.Destroy(myButton);
-        }
-    }
 
     public class ModEngineItemMenuInterface
     {
