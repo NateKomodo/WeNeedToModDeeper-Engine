@@ -34,11 +34,13 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         public string[] MessageSentV2()
         {
             var messages = GameObject.FindObjectsOfType<ChatTextColorPicker>();
+            if (messages == null) return;
             foreach (var message in messages)
             {
-                var text = message.gameObject.transform.parent.GetComponentInChildren<Text>().text;
+                var text = message.gameObject.GetComponentInChildren<Text>().text;
                 var instanceID = message.GetInstanceID();
-                if (!instanceIDs.Contains(instanceID)) {
+                if (!instanceIDs.Contains(instanceID))
+                {
                     instanceIDs.Add(instanceID);
                     return text.Split(new string[] { ": " }, StringSplitOptions.None);
                 }
