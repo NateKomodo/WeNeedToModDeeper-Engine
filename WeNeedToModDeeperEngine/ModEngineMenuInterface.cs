@@ -39,7 +39,7 @@ namespace WeNeedToModDeeperEngine
         {
             LobbyManagerBehavior.spritesForVessels = AddToArraySprite(LobbyManagerBehavior.spritesForVessels, image);
             LobbyManagerBehavior.descriptionsForVessels = AddToArrayString(LobbyManagerBehavior.descriptionsForVessels, description);
-            LobbyManagerBehavior.scenesForVessels = AddToArrayString(LobbyManagerBehavior.descriptionsForVessels, title + "_" + sceneName);
+            LobbyManagerBehavior.scenesForVessels = AddToArrayString(LobbyManagerBehavior.scenesForVessels, title + "_" + sceneName);
         }
 
         private Sprite[] AddToArraySprite(Sprite[] array, Sprite image)

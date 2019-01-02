@@ -40,7 +40,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
                 var instanceID = message.GetInstanceID();
                 if (!instanceIDs.Contains(instanceID)) {
                     instanceIDs.Add(instanceID);
-                    return text.Split(": ");
+                    return text.Split(new string[] { ": " }, StringSplitOptions.None);
                 }
             }
             return null;
