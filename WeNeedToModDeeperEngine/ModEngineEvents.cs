@@ -50,14 +50,22 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         {
             var scene = new ModEngineSceneManager();
             int current = scene.GetCurrentSceneIndex();
-            if (prevSceneBuildIndex != current) return true;
+            if (prevSceneBuildIndex != current)
+            {
+                prevSceneBuildIndex = current;
+                return true;
+            }
             return false;
         }
 
         public bool LobbyInitialized()
         {
             LobbyManagerBehavior lobby = GameObject.FindObjectOfType<LobbyManagerBehavior>();
-            if (lobby != null && prevLobby == null) return true;
+            if (lobby != null && prevLobby == null)
+            {
+                prevLobby = lobby;
+                return true;
+            }
             return false;
         }
 
