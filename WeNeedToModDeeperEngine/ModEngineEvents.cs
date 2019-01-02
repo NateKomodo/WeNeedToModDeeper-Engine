@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,10 +24,26 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
         GameObject[] prevConnected = new GameObject[1];
         LobbyManagerBehavior prevLobby = null;
         int prevSceneBuildIndex = -1;
+        List<int> instanceIDs = new List<int>();
 
         public ModEngineEvents()
         {
             if (!ModEngine.HasChecked) ModEngine.CheckForUpdates();
+        }
+
+        public string[] MessageSentV2()
+        {
+            var messages = GameObject.FindObjectsOfType<ChatTextColorPicker>();
+            foreach (var message in messages)
+            {
+                var text = message.gameObject.transform.parent.GetComponentInChildren<Text>().text;
+                var instanceID = message.GetInstanceID();
+                if (!instanceIDs.Contains(instanceID)) {
+                    instanceIDs.Add(instanceID);
+                    return text.Split(": ");
+                }
+            }
+            return null;
         }
 
         public bool SceneChanged()
