@@ -27,28 +27,29 @@ namespace WeNeedToModDeeperEngine
             LoadFromManifest();
         }
 
-        public GameObject CreateComponent(string name, Vector2 pos, int xscale = -99)
+        public GameObject CreateComponent(string name, Vector2 pos, string tag = null, int xscale = 0)
         {
             Debug.Log($"[CSUB] Creating new obj of type {name} at {pos.x}, {pos.y}");
             var newgo = GameObject.Instantiate(prefabs[name], pos, Quaternion.identity);
             newgo.transform.SetParent(GameObject.Find("SubmarineInteriorSmall").transform);
             newgo.transform.position = pos;
             newgo.name = name;
+            if (tag != null) newgo.tag = tag;
             newgo.SetActive(true);
-            if (xscale != -99) newgo.transform.localScale = new Vector2(xscale, newgo.transform.localScale.y);
-            myManifest.manifest.Add(new BuildItem() { itemName = name, mode = CreationMode.CREATE, pos = new Position() { x = pos.x, y = pos.y}, xscale = xscale, refObj = newgo });
+            if (xscale != 0) newgo.transform.localScale = new Vector2(xscale, newgo.transform.localScale.y);
+            myManifest.manifest.Add(new BuildItem() { tag = tag, itemName = name, mode = CreationMode.CREATE, pos = new Position() { x = pos.x, y = pos.y}, xscale = xscale, refObj = newgo });
             return newgo;
         }
 
-        public GameObject CreateCustomComponent(Sprite sprite, Vector2 pos, int xscale = -99)
+        public GameObject CreateCustomComponent(Sprite sprite, Vector2 pos, int xscale = 0)
         {
             Debug.Log($"[CSUB] Creating custom object at {pos.x}, {pos.y}");
             var cgo = GameObject.Instantiate(prefabs["SubmarineInteriorChunk1_03"], pos, Quaternion.identity);
             cgo.transform.SetParent(GameObject.Find("SubmarineInteriorSmall").transform);
             cgo.transform.position = pos;
-            cgo.SetActive(true);
             cgo.name = "customBGitem";
-            if (xscale != -99) cgo.transform.localScale = new Vector2(xscale, cgo.transform.localScale.y);
+            cgo.SetActive(true);
+            if (xscale != 0) cgo.transform.localScale = new Vector2(xscale, cgo.transform.localScale.y);
             cgo.GetComponentInChildren<SpriteRenderer>().sprite = sprite;
             myManifest.manifest.Add(new BuildItem() { itemName = "customBGitem", mode = CreationMode.CREATE, pos = new Position() { x = pos.x, y = pos.y}, xscale = xscale, refObj = cgo });
             return cgo;
@@ -107,9 +108,11 @@ namespace WeNeedToModDeeperEngine
                             newgo.transform.SetParent(GameObject.Find("SubmarineInteriorSmall").transform);
                             newgo.transform.position = new Vector2(item.pos.x, item.pos.y);
                             newgo.name = item.itemName;
+                            if (item.tag != null && item.tag != "") newgo.tag = item.tag;
                             newgo.SetActive(true);
-                            newgo.transform.localScale = new Vector2(item.xscale, newgo.transform.localScale.y);
+                            if (item.xscale != 0) newgo.transform.localScale = new Vector2(item.xscale, newgo.transform.localScale.y);
                             myManifest.manifest.Find(i => i == item).refObj = newgo;
+                            if (item.itemName == "CarpetEdgeTile") newgo.AddComponent<BoxCollider2D>();
                             break;
                         case CreationMode.MOVE:
                             Debug.Log($"[CSUB] Moving obj of type {item.itemName} to {item.pos.x}, {item.pos.y}");
@@ -123,9 +126,9 @@ namespace WeNeedToModDeeperEngine
                             var cgo = GameObject.Instantiate(prefabs["SubmarineInteriorChunk1_03"], new Vector2(item.pos.x, item.pos.y), Quaternion.identity);
                             cgo.transform.SetParent(GameObject.Find("SubmarineInteriorSmall").transform);
                             cgo.transform.position = new Vector2(item.pos.x, item.pos.y);
-                            cgo.SetActive(true);
                             cgo.name = "customBGitem";
-                            cgo.transform.localScale = new Vector2(item.xscale, cgo.transform.localScale.y);
+                            cgo.SetActive(true);
+                            if (item.xscale != 0) cgo.transform.localScale = new Vector2(item.xscale, cgo.transform.localScale.y);
                             cgo.GetComponentInChildren<SpriteRenderer>().sprite = LoadSpriteFromFile(item.customSprite, Vector2.zero);
                             myManifest.manifest.Find(i => i == item).refObj = cgo;
                             break;
@@ -245,7 +248,7 @@ namespace WeNeedToModDeeperEngine
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError("ModEngine Error while loading sprite: " + ex.Message);
+                Debug.LogError("ModEngine Error while loading sprite: " + ex.Message);
                 return null;
             }
         }
@@ -291,6 +294,8 @@ namespace WeNeedToModDeeperEngine
         public float xscale;
 
         public string customSprite;
+
+        public string tag;
 
         [NonSerialized]
         public GameObject refObj; //RUNTIME ONLY
