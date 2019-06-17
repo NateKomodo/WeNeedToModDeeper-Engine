@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mod makers can choose to include
 {
-    public class ModEngineCustomSubmarine //TODO ext sprite
+    public class ModEngineCustomSubmarineLegacy //TODO ext sprite
     {
         public Dictionary<string, GameObject> prefabs = new Dictionary<string, GameObject>();
 
@@ -16,7 +16,7 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 
         public string spritePath;
 
-        public ModEngineCustomSubmarine(string subPath)
+        public ModEngineCustomSubmarineLegacy(string subPath)
         {
             GameObject.FindObjectOfType<FloodSystemControllerBehavior>().puddles.Clear();
             var subint = GameObject.Find("SubmarineInteriorSmall");
