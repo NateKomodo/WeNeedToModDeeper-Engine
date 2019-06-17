@@ -34,6 +34,10 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,15 +56,42 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\WeNeedtoGoDeeper\WeNeedToGoDeeper_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="ModEngine.cs" />
+    <Compile Include="ModEngineCanvasOverlay.cs" />
+    <Compile Include="ModEngineChatMessage.cs" />
+    <Compile Include="ModEngineCommands.cs" />
+    <Compile Include="ModEngineComponents.cs" />
+    <Compile Include="ModEngineCustomEnemy.cs" />
+    <Compile Include="ModEngineCustomItem.cs" />
+    <Compile Include="ModEngineCustomSubmarine.cs" />
+    <Compile Include="ModEngineCustomSubmarineLegacy.cs" />
+    <Compile Include="ModEngineEvents.cs" />
+    <Compile Include="ModEngineMenuInterface.cs" />
+    <Compile Include="ModEngineNetwork.cs" />
+    <Compile Include="ModEngineSceneManager.cs" />
+    <Compile Include="ModEngineSpawnables.cs" />
+    <Compile Include="ModEngineSpawns.cs" />
+    <Compile Include="ModEngineSpawnTables.cs" />
+    <Compile Include="ModEngineTextOverlay.cs" />
+    <Compile Include="ModEngineTextTitle.cs" />
+    <Compile Include="ModEngineTextureChanger.cs" />
+    <Compile Include="ModEngineVariables.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
