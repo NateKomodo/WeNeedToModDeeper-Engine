@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using WeNeedToModDeeperEngine;
 
 namespace ModEngine
 {
@@ -26,18 +29,79 @@ namespace ModEngine
             LoadFromManifest();
         }
 
+        public void Save(string path)
+        {
+            File.WriteAllText(path, JsonConvert.SerializeObject(myManifest));
+        }
+
         public void LoadFromManifest()
         {
             if (myManifest == null) return;
 
+            //Load meta
+            ModEngineVariables.Substats.boostJuice = myManifest.fuel;
+            ModEngineVariables.Substats.NetworkmaxBoostJuice = myManifest.fuel;
+            ModEngineVariables.Substats.boostJuiceDrainRate = myManifest.fuelDrainRate;
+            ModEngineVariables.Substats.NetworkmaxSubHealth = myManifest.hull;
+            ModEngineVariables.Substats.NetworksubHealth = myManifest.hull;
+
+            foreach (var render in GameObject.Find("Submarine").GetComponentsInChildren<SpriteRenderer>()) render.sprite = myManifest.subSprite;
+            GameObject.Find("InteractableSub").GetComponentInChildren<SpriteRenderer>().sprite = myManifest.subSprite;
+
+            //Build sub
+            foreach (var item in myManifest.manifest)
+            {
+                try
+                {
+                    switch (item.mode)
+                    {
+                        case CreationMode.CREATE:
+                            Debug.Log($"[CSUB] Creating new obj of type {item.itemName} at {item.pos.x}, {item.pos.y}");
+                            var newgo = GameObject.Instantiate(prefabs[item.itemName], item.pos, Quaternion.identity);
+                            newgo.transform.SetParent(GameObject.Find("SubmarineInteriorSmall").transform);
+                            newgo.transform.position = item.pos;
+                            newgo.name = item.itemName;
+                            newgo.SetActive(true);
+                            newgo.transform.localScale = new Vector2(item.xscale, newgo.transform.localScale.y);
+                            break;
+                        case CreationMode.MOVE:
+                            Debug.Log($"[CSUB] Moving obj of type {item.itemName} to {item.pos.x}, {item.pos.y}");
+                            var go = GameObject.Find(item.itemName);
+                            go.transform.position = item.pos;
+                            go.transform.localScale = new Vector2(item.xscale, go.transform.localScale.y);
+                            break;
+                        case CreationMode.CUSTOM:
+                            Debug.Log($"[CSUB] Creating custom object at {item.pos.x}, {item.pos.y}");
+                            var cgo = GameObject.Instantiate(prefabs["SubmarineInteriorChunk1_03"], item.pos, Quaternion.identity);
+                            cgo.transform.SetParent(GameObject.Find("SubmarineInteriorSmall").transform);
+                            cgo.transform.position = item.pos;
+                            cgo.SetActive(true);
+                            cgo.name = "customBGitem";
+                            cgo.transform.localScale = new Vector2(item.xscale, cgo.transform.localScale.y);
+                            cgo.GetComponentInChildren<SpriteRenderer>().sprite = item.customSprite;
+                            break;
+                    }
+                }
+                catch
+                {
+                    Debug.Log($"[CSUB] Failed to proccess gameobject {item.itemName} at {item.pos.x}, {item.pos.y}");
+                }
+            }
         }
 
         public void DestroyOld()
         {
             foreach (var go in toDestroy)
             {
-                Debug.Log($"[CSUB] Destroying GO {go.name}");
-                GameObject.Destroy(go);
+                try
+                {
+                    Debug.Log($"[CSUB] Destroying GO {go.name}");
+                    GameObject.Destroy(go);
+                }
+                catch
+                {
+                    Debug.Log("[CSUB] Exception. Most likely already destroyed GO");
+                }
             }
         }
 
@@ -81,6 +145,7 @@ namespace ModEngine
             alias.Add("ladder", "obj_ladder_piece");
             alias.Add("floorcollider", "InteriorGroundCollider");
             alias.Add("wallcollider", "InteriorWallCollider");
+            alias.Add("bg", "SubmarineInteriorChunk1_03");
         }
     }
 
@@ -88,9 +153,9 @@ namespace ModEngine
     {
         public Sprite subSprite;
 
-        public int health;
+        public int hull;
 
-        public int fuel;
+        public float fuel;
 
         public float fuelDrainRate;
 
