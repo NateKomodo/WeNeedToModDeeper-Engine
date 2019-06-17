@@ -18,9 +18,13 @@ namespace WeNeedToModDeeperEngine
 
         public BuildManifest myManifest;
 
-        public ModEngineCustomSubmarine(BuildManifest buildManifest)
+        public bool corperative;
+
+        public ModEngineCustomSubmarine(BuildManifest buildManifest, bool corperativeMode)
         {
             if (buildManifest == null) myManifest = new BuildManifest(); else myManifest = buildManifest;
+            corperative = corperativeMode;
+            if (myManifest.wasBuiltCoOp) corperative = true;
             AddAlias();
             PopulatePrefabs();
             DestroyOld();
@@ -64,7 +68,15 @@ namespace WeNeedToModDeeperEngine
                 if (go == null) continue;
                 myManifest.manifest.Find(j => j.refObj == i.refObj).pos = new Position() { x = go.transform.position.x, y = go.transform.position.y };
             }
-            myManifest.manifest.RemoveAll(i => i.refObj == null);
+            myManifest.manifest.RemoveAll(i =>
+            {
+                if (i.refObj == null)
+                {
+                    Debug.Log($"RefObj for {i.itemName} was null, removing");
+                    return true;
+                }
+                return false;
+            });
             foreach (var val in myManifest.manifest.ToArray())
             {
                 if (val.refObj != null) myManifest.manifest.Find(i => i.refObj = val.refObj).refObj = null;
@@ -117,9 +129,11 @@ namespace WeNeedToModDeeperEngine
                         case CreationMode.MOVE:
                             Debug.Log($"[CSUB] Moving obj of type {item.itemName} to {item.pos.x}, {item.pos.y}");
                             var go = GameObject.Find(item.itemName);
-                            go.transform.position = new Vector2(item.pos.x, item.pos.y);
-                            go.transform.localScale = new Vector2(item.xscale, go.transform.localScale.y);
+                            if (go == null) { Debug.Log("GO null, abort"); break; }
+                            if (!item.fromPopulate) go.transform.position = new Vector2(item.pos.x, item.pos.y);
+                            if (item.xscale != 0) go.transform.localScale = new Vector2(item.xscale, go.transform.localScale.y);
                             myManifest.manifest.Find(i => i == item).refObj = go;
+                            if (item.fromPopulate) myManifest.manifest.Find(i => i == item).fromPopulate = false;
                             break;
                         case CreationMode.CUSTOM:
                             Debug.Log($"[CSUB] Creating custom object at {item.pos.x}, {item.pos.y}");
@@ -134,9 +148,9 @@ namespace WeNeedToModDeeperEngine
                             break;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Debug.Log($"[CSUB] Failed to proccess gameobject {item.itemName} at {item.pos.x}, {item.pos.y}");
+                    Debug.Log($"[CSUB] Failed to proccess gameobject {item.itemName} at {item.pos.x}, {item.pos.y}: Error: {ex}");
                 }
             }
         }
@@ -168,6 +182,7 @@ namespace WeNeedToModDeeperEngine
             if (indent > 3) return;
             foreach (Transform child in parent.transform)
             {
+                Debug.Log($"[Tree] {child.gameObject.name}");
                 var go = child.gameObject;
                 List<string> vals = new List<string>();
                 foreach (var alias in alias.Values) vals.Add(alias);
@@ -177,18 +192,54 @@ namespace WeNeedToModDeeperEngine
                     newGo.SetActive(false);
                     if (!prefabs.ContainsKey(go.name)) prefabs.Add(go.name, newGo);
                 }
-                if (indent == 1 && !child.gameObject.name.Contains("Consoles")) toDestroy.Add(child.gameObject);
-                if (indent == 2 && !(child.gameObject.name.Contains("Console") && child.gameObject.name.Contains("Rigger"))) toDestroy.Add(child.gameObject);
-                if (child.gameObject.name.Contains("Console") && child.gameObject.name.Contains("Rigger"))
+                if (indent == 1 && !go.name.Contains("Consoles") && ShouldDelete(go))
                 {
+                    toDestroy.Add(child.gameObject);
+                    Debug.Log($"[CSUB] Flagged {go.name} for destruction");
+                }
+                if (indent >= 2 && ShouldDelete(go))
+                {
+                    Debug.Log($"[CSUB] Flagged {go.name} for destruction");
+                    toDestroy.Add(child.gameObject);
+                }
+                if (!ShouldDelete(go))
+                {
+                    Debug.Log($"[CSUB] Adding {go.name} to manifest");
                     if (myManifest.manifest.Find(i => i.itemName == child.gameObject.name) == null)
                     {
-                        Debug.Log("Add entry to manifest");
-                        myManifest.manifest.Add(new BuildItem() { itemName = go.name, mode = CreationMode.MOVE, pos = new Position() { x = go.transform.position.x, y = go.transform.position.y }, xscale = go.transform.localScale.x });
+                        myManifest.manifest.Add(new BuildItem() { fromPopulate = true, itemName = go.name, mode = CreationMode.MOVE, pos = new Position() { x = go.transform.position.x, y = go.transform.position.y }, xscale = go.transform.localScale.x });
                     }
+                    if (go == null) Debug.Log($"Suddenly, {go.name} was null");
                 }
-                RecursivePopulate(go, indent + 1);
+                else if (ShouldContinue(go))
+                {
+                    Debug.Log($"Continue to recurse {go.name}");
+                    RecursivePopulate(go, indent + 1);
+                }
+                else
+                {
+                    Debug.Log($"[CSUB] Flagged {go.name} for destruction");
+                    toDestroy.Add(child.gameObject);
+                }
             }
+        }
+
+        public bool ShouldContinue(GameObject go)
+        {
+            return go.name.Contains("Decoration") || go.name.Contains("DepthMeterCanvas") || go.name.Contains("Consoles");
+        }
+
+        public bool ShouldDelete(GameObject go)
+        {
+            if (corperative) return false;
+            try
+            {
+                bool flag = false;
+                if (go.transform.parent != null) flag = go.transform.parent.gameObject.name.Contains("DepthMeterCanvas");
+                if ((go.name.Contains("Console") && go.name.Contains("Rigger")) || go.name.Contains("Torpedo") || go.name.Contains("DepthMeterCanvas") || go.name.Contains("Bed") || flag) return false;
+            }
+            catch { }
+            return true;
         }
 
         public void AddAlias()
@@ -205,8 +256,6 @@ namespace WeNeedToModDeeperEngine
             alias.Add("transition", "Transition");
             alias.Add("ttspawnpoint", "TimeTravelerSpawnPoint");
             alias.Add("ladder", "obj_ladder_piece");
-            alias.Add("floorcollider", "InteriorGroundCollider");
-            alias.Add("wallcollider", "InteriorWallCollider");
             alias.Add("bg", "SubmarineInteriorChunk1_03");
         }
 
@@ -271,6 +320,8 @@ namespace WeNeedToModDeeperEngine
     [Serializable]
     public class BuildManifest
     {
+        public bool wasBuiltCoOp;
+
         public string subSprite;
 
         public int hull;
@@ -296,6 +347,8 @@ namespace WeNeedToModDeeperEngine
         public string customSprite;
 
         public string tag;
+
+        public bool fromPopulate;
 
         [NonSerialized]
         public GameObject refObj; //RUNTIME ONLY
