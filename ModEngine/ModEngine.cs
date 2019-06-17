@@ -13,9 +13,11 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
 
         public static bool HasChecked = false;
 
+        public static bool isBeta = true;
+
         public static void CheckForUpdates()
         {
-            if (HasChecked) return;
+            if (HasChecked || isBeta) return;
             HasChecked = true;
             try
             {

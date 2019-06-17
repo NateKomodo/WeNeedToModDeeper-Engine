@@ -299,5 +299,9 @@ namespace WeNeedToModDeeperEngine //NOTE the types below are a framework that mo
             if (Input.GetKey(key)) return true;
             return false;
         }
+        public GameObject Player
+        {
+            get { return NetworkManagerBehavior.myLocalPlayer; }
+        }
     }
 }
