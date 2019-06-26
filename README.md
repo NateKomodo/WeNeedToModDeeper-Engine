@@ -5,6 +5,8 @@ Mod engine core for We need to go deeper, it is installed by my other repo, WeNe
 
 **As we now use IPA, this engine is used as a framework or utility for IPA plugins**
 
+# Please note this documentation is missing a number of other functions that are currently in the mod engine.
+
 # Making a plugin
 A plugin/mod is a way to modify the way the game works
 
